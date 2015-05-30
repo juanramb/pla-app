@@ -1,0 +1,25 @@
+$font-name-heading:       'roboto-slab';
+$font-lang:               'en';
+@import '../public/components/polymer-theme/sass/_base';
+@import '../public/components/polymer-theme/sass/typography/fonts';
+
+body {
+  font-family: $font-body;
+  /deep/ {
+    h1,
+    h2,
+    h3 {
+      font-family: $font-heading;
+    }
+  }
+}
+
+.polymer-theme {
+  $color-name-primary:    'teal';
+  $color-name-secondary:  'amber';
+  $color-name-text:       'grey';
+  @import '../public/components/polymer-theme/sass/variables';
+  /deep/ {
+    @import '../public/components/polymer-theme/sass/blocks/all';
+  }
+}

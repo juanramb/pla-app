@@ -1,0 +1,90 @@
+<polymer-element name="pla-event-list">
+  <template>
+    <style>
+      .event-container {
+        height: 200px;
+        background: white;
+      }
+      .event {
+        height: 150px;
+        margin: 5px;
+      }
+      .core-selected {
+        opacity: 0.5;
+      }
+      .event-detailed {
+        height: 700px;
+      }
+
+    </style>
+    
+    <meteor-query id="querylist" collection="{{collection}}" options="{{queryoptions}}" data="{{events}}">
+    </meteor-query>
+    <div layout vertical>
+
+      <div layout horizontal>
+        <p>Use slider to select events shown</p>
+        <paper-slider center snaps pin secondaryprogress="5" editable value="{{maxEvents}}" min="5" id="paper_slider">
+        </paper-slider>
+      </div>
+      <div>
+        Number of events: {{events.length}} </br>
+        <paper-spinner id="spinner">
+      </div>
+      <div class="event-container" horizontal layout center>
+        <core-selector id="selector" selected="{{selectedEvent}}" valueattr="data" horizontal layout center flex>
+        <template repeat="{{event in events}}">
+          <pla-event class="event" data="{{event}}" flex>
+          </pla-event>
+        </template>
+        </core-selector>
+      </div>
+      <div horizontal center-justified layout>
+        <pla-event class="event-detail" data="{{selectedEvent}}" detailed flex>
+        </pla-event>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer('pla-event-list', {
+      publish: {
+        //data: null,
+        selectedEvent: null,
+        maxEvents: 10,
+        queryoptions: null
+      },
+      collection: null,
+      events: null,
+      created: function () {
+        this.maxEvents = 10;
+        this.queryoptions = {
+          sort: {
+            "header.Timestamp": -1
+          },
+          limit: this.maxEvents
+        };
+      },
+      eventsChanged: function () {
+        this.$.spinner.active = true;
+        this.job('evtchanged', function () {
+          this.$.spinner.active = false;
+        }, 1000);
+      },
+      maxEventsChanged: function() {
+        console.log('Changing maxEvents to: '+this.maxEvents);
+        console.log('old queryoptions: ',this.queryoptions);
+        this.queryoptions = {
+          sort: {
+            "header.Timestamp": -1
+          },
+          limit: this.maxEvents
+        };
+        console.log('new queryoptions: ',this.queryoptions);
+        console.log('meteor-query options: ',this.$.querylist.options);
+      },
+      selectedEventChanged: function () {
+        console.log('selectedEvent: ',this.selectedEvent);
+      }
+    });
+  </script>
+</polymer-element>

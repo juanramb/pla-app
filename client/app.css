@@ -1,0 +1,348 @@
+@import url("//fonts.googleapis.com/css?family=Roboto:regular,medium|Roboto+Slab:light,regular&lang=en");
+@import url("//fonts.googleapis.com/css?family=Roboto:regular,medium|Roboto+Slab:light,regular&lang=en");
+* {
+  box-sizing: border-box; }
+
+*:before,
+*:after {
+  box-sizing: border-box; }
+
+html {
+  font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  text-size-adjust: 100%;
+  -webkit-touch-callout: none; }
+
+html /deep/ a {
+  color: currentColor;
+  text-decoration: none; }
+html /deep/ svg {
+  fill: currentColor; }
+
+/**
+ * Retrieves a font name from the $roboto-fonts Sass map
+ *
+ * @function
+ * @param {string} font-name             - quoted, lower-case, dasherized font
+ *                                          name (e.g. 'alegreya')
+ * @param {string} [font-type='heading']  - quoted, lower-case font type (e.g.
+ *                                          'heading')
+ */
+.polymer-theme /deep/ .brand_drawer_toolbar .brand__text, .polymer-theme /deep/ .main__title {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: .05px;
+  line-height: 28px; }
+html /deep/ b,
+html /deep/ strong {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .1px;
+  line-height: 24px; }
+  @media all and (max-width: 640px) {
+    html /deep/ b,
+    html /deep/ strong {
+      font-size: 14px; } }
+.polymer-theme /deep/ .menu__item {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: .1px;
+  line-height: 24px; }
+  @media all and (max-width: 640px) {
+    .polymer-theme /deep/ .menu__item {
+      font-size: 14px; } }
+.polymer-theme /deep/ .button {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .1px;
+  line-height: 20px;
+  text-transform: uppercase; }
+
+html /deep/ .text_display_4 {
+  font-size: 112px;
+  font-weight: 300;
+  letter-spacing: -5px;
+  line-height: 128px; }
+html /deep/ .text_display_3 {
+  font-size: 56px;
+  font-weight: 400;
+  letter-spacing: -1px;
+  line-height: 72px; }
+html /deep/ .text_display_2 {
+  font-size: 45px;
+  font-weight: 400;
+  letter-spacing: -1px;
+  line-height: 61px; }
+html /deep/ .text_display_1 {
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 50px; }
+html /deep/ .text_headline {
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 32px; }
+html /deep/ .text_title {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: .05px;
+  line-height: 28px; }
+html /deep/ .text_subhead {
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: .1px;
+  line-height: 24px; }
+  @media all and (max-width: 640px) {
+    html /deep/ .text_subhead {
+      font-size: 16px; } }
+html /deep/ .text_body_2 {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .1px;
+  line-height: 24px; }
+  @media all and (max-width: 640px) {
+    html /deep/ .text_body_2 {
+      font-size: 14px; } }
+html /deep/ .text_body_1 {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: .1px;
+  line-height: 24px; }
+  @media all and (max-width: 640px) {
+    html /deep/ .text_body_1 {
+      font-size: 14px; } }
+html /deep/ .text_caption {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .2px;
+  line-height: 20px; }
+html /deep/ .text_button {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .1px;
+  line-height: 20px;
+  text-transform: uppercase; }
+
+/**
+ * Retrieves a font name from the $roboto-fonts Sass map
+ *
+ * @function
+ * @param {string} font-name             - quoted, lower-case, dasherized font
+ *                                          name (e.g. 'alegreya')
+ * @param {string} [font-type='heading']  - quoted, lower-case font type (e.g.
+ *                                          'heading')
+ */
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif; }
+  body /deep/ h1,
+  body /deep/ h2,
+  body /deep/ h3 {
+    font-family: "Roboto Slab", serif; }
+
+.polymer-theme {
+  /**
+   * Retrieves a color value from the $material-colors Sass map
+   *
+   * @function
+   * @param {string} color-name             - quoted, lower-case, dasherized color
+   *                                          name (e.g. 'pink', 'amber')
+   * @param {string} [color-variant='500']  - quoted, lower-case color variant (e.g.
+   *                                          '200', 'a100')
+   * @param {string} [color-type='primary'] - quoted, lower-case color type
+   */ }
+  .polymer-theme /deep/ .brand_drawer_toolbar {
+    background: #fff; }
+    .polymer-theme /deep/ .brand_drawer_toolbar .brand__logo {
+      color: #009688;
+      margin-right: 8px; }
+    .polymer-theme /deep/ .brand_drawer_toolbar .brand__text {
+      color: #757575; }
+  .polymer-theme /deep/ .button:hover {
+    background: #eeeeee; }
+  .polymer-theme /deep/ .button_primary {
+    color: #00796b; }
+    .polymer-theme /deep/ .button_primary:hover {
+      background: #e0f2f1; }
+    .polymer-theme /deep/ .button_primary_disabled {
+      background: #eeeeee;
+      color: #80cbc4; }
+    .polymer-theme /deep/ .button_primary_raised {
+      background: #009688;
+      color: #fff; }
+      .polymer-theme /deep/ .button_primary_raised:hover {
+        background: #00796b; }
+  .polymer-theme /deep/ .button_secondary {
+    color: #ffa000; }
+    .polymer-theme /deep/ .button_secondary:hover {
+      background: #fff8e1; }
+    .polymer-theme /deep/ .button_secondary_disabled {
+      background: #eeeeee;
+      color: #ffe082; }
+    .polymer-theme /deep/ .button_secondary_raised {
+      background: #ffc107;
+      color: #212121; }
+      .polymer-theme /deep/ .button_secondary_raised:hover {
+        background: #ffa000; }
+  .polymer-theme /deep/ .button_success {
+    color: #388e3c; }
+    .polymer-theme /deep/ .button_success:hover {
+      background: #e8f5e9; }
+    .polymer-theme /deep/ .button_success_disabled {
+      background: #eeeeee;
+      color: #a5d6a7; }
+    .polymer-theme /deep/ .button_success_raised {
+      background: #4caf50;
+      color: #fff; }
+      .polymer-theme /deep/ .button_success_raised:hover {
+        background: #388e3c; }
+  .polymer-theme /deep/ .button_info {
+    color: #0288d1; }
+    .polymer-theme /deep/ .button_info:hover {
+      background: #e1f5fe; }
+    .polymer-theme /deep/ .button_info_disabled {
+      background: #eeeeee;
+      color: #81d4fa; }
+    .polymer-theme /deep/ .button_info_raised {
+      background: #03a9f4;
+      color: #fff; }
+      .polymer-theme /deep/ .button_info_raised:hover {
+        background: #0288d1; }
+  .polymer-theme /deep/ .button_warning {
+    color: #ffa000; }
+    .polymer-theme /deep/ .button_warning:hover {
+      background: #fff8e1; }
+    .polymer-theme /deep/ .button_warning_disabled {
+      background: #eeeeee;
+      color: #ffca28; }
+    .polymer-theme /deep/ .button_warning_raised {
+      background: #ffc107;
+      color: #212121; }
+      .polymer-theme /deep/ .button_warning_raised:hover {
+        background: #ffa000; }
+  .polymer-theme /deep/ .button_error {
+    color: #d32f2f; }
+    .polymer-theme /deep/ .button_error:hover {
+      background: #ffebee; }
+    .polymer-theme /deep/ .button_error_disabled {
+      background: #eeeeee;
+      color: #ef9a9a; }
+    .polymer-theme /deep/ .button_error_raised {
+      background: #f44336;
+      color: #fff; }
+      .polymer-theme /deep/ .button_error_raised:hover {
+        background: #d32f2f; }
+  .polymer-theme /deep/ .button_link {
+    color: #00796b; }
+    .polymer-theme /deep/ .button_link:hover {
+      background: #e0f2f1; }
+    .polymer-theme /deep/ .button_link_disabled {
+      background: transparent;
+      color: #b2dfdb; }
+    .polymer-theme /deep/ .button_link_raised {
+      background: transparent;
+      color: #00796b; }
+      .polymer-theme /deep/ .button_link_raised:hover {
+        background: #e0f2f1; }
+  .polymer-theme /deep/ .button_border {
+    border: 1px solid currentColor; }
+  .polymer-theme /deep/ .button_round-border {
+    border: 1px solid currentColor;
+    border-radius: 10em;
+    padding-left: 8px;
+    padding-right: 8px; }
+  .polymer-theme /deep/ .drawer {
+    background: #fff;
+    color: #212121; }
+    .polymer-theme /deep/ .drawer__content {
+      border-right: 1px solid #e0e0e0;
+      height: calc(100vh - 64px); }
+      @media all and (max-width: 640px) {
+        .polymer-theme /deep/ .drawer__content {
+          border: 0; } }
+    .polymer-theme /deep/ .drawer__footer {
+      padding: 8px 0 16px; }
+    .polymer-theme /deep/ .drawer__widget {
+      padding: 8px 0; }
+  .polymer-theme /deep/ .dropdown-menu_primary {
+    color: #00796b; }
+  .polymer-theme /deep/ .dropdown-menu_secondary {
+    color: #ffa000; }
+  .polymer-theme /deep/ .dropdown-menu_success {
+    color: #388e3c; }
+  .polymer-theme /deep/ .dropdown-menu_info {
+    color: #0288d1; }
+  .polymer-theme /deep/ .dropdown-menu_warning {
+    color: #ffa000; }
+  .polymer-theme /deep/ .dropdown-menu_error {
+    color: #d32f2f; }
+  .polymer-theme /deep/ .fab {
+    background: #ffd740;
+    color: #212121; }
+    .polymer-theme /deep/ .fab_bottom_right {
+      bottom: 32px;
+      position: fixed;
+      right: 32px; }
+      @media all and (max-width: 640px) {
+        .polymer-theme /deep/ .fab_bottom_right {
+          bottom: 16px;
+          right: 16px; } }
+  .polymer-theme /deep/ .icon-button_primary {
+    color: #00796b; }
+    .polymer-theme /deep/ .icon-button_primary_disabled {
+      color: #b2dfdb; }
+  .polymer-theme /deep/ .icon-button_secondary {
+    color: #ffa000; }
+    .polymer-theme /deep/ .icon-button_secondary_disabled {
+      color: #ffecb3; }
+  .polymer-theme /deep/ .icon-button_success {
+    color: #388e3c; }
+    .polymer-theme /deep/ .icon-button_success_disabled {
+      color: #c8e6c9; }
+  .polymer-theme /deep/ .icon-button_info {
+    color: #0288d1; }
+    .polymer-theme /deep/ .icon-button_info_disabled {
+      color: #b3e5fc; }
+  .polymer-theme /deep/ .icon-button_warning {
+    color: #ffa000; }
+    .polymer-theme /deep/ .icon-button_warning_disabled {
+      color: #ffecb3; }
+  .polymer-theme /deep/ .icon-button_error {
+    color: #d32f2f; }
+    .polymer-theme /deep/ .icon-button_error_disabled {
+      color: #ffcdd2; }
+  .polymer-theme /deep/ .main__content {
+    background: #fff;
+    color: #212121; }
+    .polymer-theme /deep/ .main__content /deep/ a {
+      color: #00796b; }
+      .polymer-theme /deep/ .main__content /deep/ a:hover {
+        text-decoration: underline; }
+  .polymer-theme /deep/ .main__title {
+    padding-left: 32px; }
+    @media all and (max-width: 640px) {
+      .polymer-theme /deep/ .main__title {
+        padding-left: 0; } }
+  .polymer-theme /deep/ .main__toolbar {
+    background: #009688;
+    color: #fff; }
+  .polymer-theme /deep/ .menu__item {
+    transition: all 300ms ease-in-out; }
+    .polymer-theme /deep/ .menu__item.core-selected {
+      font-weight: 500; }
+    .polymer-theme /deep/ .menu__item:hover {
+      font-weight: 500; }
+    .polymer-theme /deep/ .menu__item::shadow #ripple {
+      color: #424242; }
+    .polymer-theme /deep/ .menu__item_primary {
+      color: #00796b; }
+      .polymer-theme /deep/ .menu__item_primary.core-selected {
+        background: #e0f2f1; }
+      .polymer-theme /deep/ .menu__item_primary::shadow #ripple {
+        color: #009688; }
+    .polymer-theme /deep/ .menu__item_secondary {
+      color: #ffa000; }
+      .polymer-theme /deep/ .menu__item_secondary.core-selected {
+        background: #fff8e1; }
+      .polymer-theme /deep/ .menu__item_secondary::shadow #ripple {
+        color: #ffc107; }
+  .polymer-theme /deep/ .menu__icon {
+    margin-right: 16px; }

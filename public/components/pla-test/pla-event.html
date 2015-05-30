@@ -1,0 +1,84 @@
+<polymer-element name="pla-event" layout vertical >
+  <template>
+    <style>
+      .gcc {
+        background: #34b0f1;
+      }
+      .svn {
+        background: #f17782;
+      }
+      .valgrind {
+        background: #63dd6e;
+      }
+      .kate {
+        background: orange;
+      }
+      .event-detail {
+        height: 700px;
+        width: 100%;
+      }
+      .event-body {
+        padding: 10px;
+        background-color: white;
+        height: 500px;
+      }
+    </style>
+
+    <template if="{{!detailed}}">
+      <div class="{{data.header.application}}" flex layout vertical>
+        <core-tooltip flex layout vertical>
+          <div id="event" flex horizontal>
+            <template if="{{!detailed}}">
+              <span flex></span>
+            </template>
+          </div>
+          <div tip>
+            {{data.header.Timestamp}} : 
+            <span class="{{app}}">{{data.header.application}}</span> :
+              {{data._id}} <br/>
+              <br/>
+              {{data.eventId}}
+          </div>
+        </core-tooltip>
+      </div>
+    </template>
+    <template if="{{detailed}}">
+      <div class="{{data.header.application}} event-detail" layout vertical>
+        <div class="event-header">
+          <ul>
+            <template repeat="{{key in plaEventKeys}}">
+              <template if="{{key !== 'body'}}">
+                <li>
+                  {{key}} : {{data[key]}}
+                </li>
+              </template>
+            </template>
+          </ul>
+        </div>
+        <div class="event-body">
+        <span>
+          <pre>
+              {{data.body}}
+          </pre>
+        </span>
+        </div>
+      </div>
+    </template>
+  </template>
+  <script>
+    Polymer('pla-event', {
+      collection: null,
+      publish: {
+        data: null,
+        plaEventId: null,
+        detailed: false,
+        app: null,
+      },
+      plaEventKeys: null,
+      dataChanged : function() {
+        this.plaEventKeys = Object.keys(this.data);
+        this.app = this.data.header.application;
+      }
+    });
+  </script>
+</polymer-element>

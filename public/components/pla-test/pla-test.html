@@ -1,0 +1,87 @@
+<polymer-element name="pla-test" fit>
+  <template>
+  <style>
+
+  </style>
+  <core-scroll-header-panel flex condenses>
+    <core-toolbar class="main__toolbar">
+      <core-icon-button icon="menu"></core-icon-button>
+      <span flex> PLA events </span>
+      <core-icon-button icon="{{statusIcon}}"></core-icon-button>
+      <span> {{metStatus.status}} </span>
+    </core-toolbar>
+    <div class="content" layout vertical>
+      <meteor-status status="{{metStatus}}"></meteor-status>
+  
+      <meteor-collection name="plaevents" ref="{{collection}}"></meteor-collection>
+  
+      <meteor-subscribe name="allevents" isready="{{subReady}}">
+      </meteor-subscribe>
+      <meteor-query id="query" options="{{options}}" query="{{query}}" data="{{allEvents}}">
+      </meteor-query>
+      <div>
+          <h2>
+             Events for {{collection._name}}
+          </h2>
+          Sub ready: {{subReady}}
+          <pla-event-list id="eventlist">
+          </pla-event-list>
+      </div>
+      <div horizontal center-justified layout>
+        <pla-chart data="{{events}}" heading="Testing d3">
+        </pla-chart>
+      </div>
+
+      <div relative style="height: 300px; " id="svgdiv">
+      <pla-event collection="{{collection}}" plaEvent="{{selectedEvent}}">
+      </pla-event>
+      </div>
+
+    </core-scroll-header-panel>
+  </template>
+
+  <script>
+    Polymer('pla-test', {
+      collection: null,
+      subReady: false,
+      maxEvents: null,
+      allEvents: null,
+      selectedEvent: null,
+      selectedId: null,
+      metStatus: null,
+      statusIcon: null,
+      //query: {
+      //   "header.application": "gcc"
+      //},
+      options: {
+        sort: {
+          "header.Timestamp": -1
+        },
+        limit: 10
+      },
+      optionsChanged: function () {
+        console.log('on pla-test, options changed to: ',options);
+      },
+      selectedIdChanged: function () {
+        this.selectedEvent = this.collection.findOne(this.selectedId);
+      },
+      subReadyChanged: function() {
+        // wait subscribtion ready state before querying
+        console.log('Subready changed');
+        if (this.subReady && this.collection) {
+          console.log('Collection: ',this.collection);
+          //this.plaevents=this.collection.find();
+          //console.log('Plaevents: ',this.plaevents);
+          this.$.query.collection = this.collection;
+          this.$.eventlist.collection = this.collection;
+        }
+      },
+      metStatusChanged: function () {
+        console.log('status changed to: ',this.metStatus);
+        this.statusIcon = this.metStatus.connected ? 'cloud-done' : 'cloud-off';
+      }
+
+    });
+  </script>
+</polymer-element>
+
