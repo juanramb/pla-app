@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# given a file.txt with groups in the form:
+# groupname1 = nia1 nia2 nia3
+# pairname2 = nia3 nia2
+# generates a json text in the form:
+# module.exports = { groups: [ {name: "groupname1", members: [ {nia: "nia1"}, {nia: "nia2"}, {nia: "nia3"} ] },
+#   { name: "pairname2", members: [ {nia: "nia3"}, {nia: "nia2"} ] } ],
+#   alumns: [ {nia: "nia1"}, {nia: "nia2"}, {nia: "nia3"} ]
+# }
+#
+# usage: ./data2json grupos.txt > datos.json
+file=$1
+groups=$(cut -d " " -f 1 $file)
+allrawmembers=""
+data="module.exports = { \
+            groups: [ \
+                      "
+for group in $groups; do
+  data=$data" { name: \""$group"\", members: [ "
+  datagroup=""
+  members=$(grep $group $file |cut -d " " --complement -f 1 | cut -d "=" -f 2);
+  datamembers=""
+  for member in $members; do
+    datamembers=$datamembers"{ nia: \""$member"\" }, "
+    allrawmembers=$allrawmembers" \n"$member
+  done
+  datagroup=${datamembers%,*}" ] },\n"
+  data=$data${datagroup}
+  #echo "members for group:"$group" are:"$members;
+done
+uniquemembers=$(echo -e $allrawmembers | sort | uniq)
+uniquejson="alumns: ["
+for member in $uniquemembers; do
+  uniquejson=$uniquejson" { nia: \""$member"\"}, "
+done
+uniquejson=${uniquejson%,*}"]"
+
+data=${data%,*}" ], \n $uniquejson }"
+
+echo -e $data
+echo
+#echo $allmembers
