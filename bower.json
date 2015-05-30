@@ -4,7 +4,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "webcomponentsjs": "~0.5.0",
     "polymer": "Polymer/polymer#~0.5.0",
     "paper-button": "Polymer/paper-button#~0.5.0",
     "core-list": "Polymer/core-list#~0.5.5",
@@ -17,7 +16,6 @@
     "core-selector": "Polymer/core-selector#~0.5.5"
   },
   "resolutions": {
-    "webcomponentsjs": "~0.5.0",
-    "polymer": "~0.5.0"
+    "polymer": "^0.5.0"
   }
 }
