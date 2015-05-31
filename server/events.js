@@ -5,3 +5,4 @@ Meteor.publish('allevents', function() {
   return Events.find();
 });
 
+

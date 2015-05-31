@@ -24,7 +24,7 @@
       }
     </style>
 
-    <template if="{{!detailed}}">
+    <template if="{{!detailed && data.header}}">
       <div class="{{data.header.application}}" flex layout vertical>
         <core-tooltip flex layout vertical>
           <div id="event" flex horizontal>
@@ -42,7 +42,7 @@
         </core-tooltip>
       </div>
     </template>
-    <template if="{{detailed}}">
+    <template if="{{detailed && data.header}}">
       <div class="{{data.header.application}} event-detail" layout vertical>
         <div class="event-header">
           <ul>
@@ -76,8 +76,10 @@
       },
       plaEventKeys: null,
       dataChanged : function() {
-        this.plaEventKeys = Object.keys(this.data);
-        this.app = this.data.header.application;
+        if (this.data.header) {
+          this.plaEventKeys = Object.keys(this.data);
+          this.app = this.data.header.application;
+        }
       }
     });
   </script>

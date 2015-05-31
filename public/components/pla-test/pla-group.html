@@ -1,0 +1,16 @@
+<polymer-element name="pla-group" layout vertical >
+  <template>
+    <style>
+    </style>
+    <div id="{{data.name}}">{{data.name}}</div>
+  </template>
+  <script>
+    Polymer('pla-group', {
+      collection: null,
+      publish: {
+        data: null,
+        plaGroupId: null
+      },
+    });
+  </script>
+</polymer-element>

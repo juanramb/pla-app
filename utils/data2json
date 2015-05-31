@@ -13,16 +13,16 @@
 file=$1
 groups=$(cut -d " " -f 1 $file)
 allrawmembers=""
-data="module.exports = { \
-            groups: [ \
+data="{ \
+            \"groups\": [ \
                       "
 for group in $groups; do
-  data=$data" { name: \""$group"\", members: [ "
+  data=$data" { \"name\": \""$group"\", \"members\": [ "
   datagroup=""
   members=$(grep $group $file |cut -d " " --complement -f 1 | cut -d "=" -f 2);
   datamembers=""
   for member in $members; do
-    datamembers=$datamembers"{ nia: \""$member"\" }, "
+    datamembers=$datamembers"{ \"nia\": \""$member"\" }, "
     allrawmembers=$allrawmembers" \n"$member
   done
   datagroup=${datamembers%,*}" ] },\n"
@@ -30,9 +30,9 @@ for group in $groups; do
   #echo "members for group:"$group" are:"$members;
 done
 uniquemembers=$(echo -e $allrawmembers | sort | uniq)
-uniquejson="alumns: ["
+uniquejson="\"alumns\": ["
 for member in $uniquemembers; do
-  uniquejson=$uniquejson" { nia: \""$member"\"}, "
+  uniquejson=$uniquejson" { \"nia\": \""$member"\"}, "
 done
 uniquejson=${uniquejson%,*}"]"
 

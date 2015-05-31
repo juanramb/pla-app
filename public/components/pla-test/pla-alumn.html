@@ -1,0 +1,16 @@
+<polymer-element name="pla-alumn" layout vertical >
+  <template>
+    <style>
+    </style>
+    <div id="{{data.nia}}">{{data.nia}}</div>
+  </template>
+  <script>
+    Polymer('pla-alumn', {
+      collection: null,
+      publish: {
+        data: null,
+        plaAlumnId: null
+      },
+    });
+  </script>
+</polymer-element>

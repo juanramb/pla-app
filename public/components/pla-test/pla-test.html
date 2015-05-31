@@ -1,42 +1,105 @@
 <polymer-element name="pla-test" fit>
   <template>
-  <style>
+    <style>
+      .filtering {
+        margin: 10px;
+        padding: 5px;
+      }
+      .core-selected {
+        opacity: 0.5;
+        background-color: grey;
+      }
+      .filtering-column {
+        margin: 5px;
+      }
+    </style>
+    <core-scroll-header-panel flex condenses>
+      <core-toolbar class="main__toolbar">
+        <core-icon-button icon="menu"></core-icon-button>
+        <span flex> PLA events </span>
+        <core-icon-button icon="{{statusIcon}}"></core-icon-button>
+        <span> {{metStatus.status}} </span>
+      </core-toolbar>
+      <div class="content" layout horizontal>
+        <meteor-status status="{{metStatus}}"></meteor-status>
+    
+        <meteor-collection name="plaevents" ref="{{collection}}"></meteor-collection>
+        <meteor-collection name="alumns" ref="{{alumnsCollection}}"></meteor-collection>
+        <meteor-collection name="groups" ref="{{groupsCollection}}"></meteor-collection>
+        <meteor-collection name="apps" ref="{{appsCollection}}"></meteor-collection>
+        
+        <meteor-subscribe name="allevents" isready="{{subReady}}">
+        </meteor-subscribe>
+        <meteor-subscribe name="allalumns" isready="{{alumnsSubReady}}">
+        </meteor-subscribe>
+        <meteor-subscribe name="allgroups" isready="{{groupsSubReady}}">
+        </meteor-subscribe>
+        <meteor-subscribe name="allapps" isready="{{appsSubReady}}">
+        </meteor-subscribe>
+        <meteor-query id="query" options="{{options}}" query="{{query}}" data="{{allEvents}}">
+        </meteor-query>
+        <meteor-query id="groupsQuery" options="{{groupsQueryOptions}}" data="{{groups}}">
+        </meteor-query>
+        <meteor-query id="alumnsQuery" query="{{alumnsQuery}}" options="{{alumnsQueryOptions}}" data="{{alumns}}">
+        </meteor-query>
+        <meteor-query id="appsQuery" query="{{appsQuery}}" options="{{appsQueryOptions}}" data="{{apps}}">
+        </meteor-query>
+        <div id="events" layout vertical flex>
 
-  </style>
-  <core-scroll-header-panel flex condenses>
-    <core-toolbar class="main__toolbar">
-      <core-icon-button icon="menu"></core-icon-button>
-      <span flex> PLA events </span>
-      <core-icon-button icon="{{statusIcon}}"></core-icon-button>
-      <span> {{metStatus.status}} </span>
-    </core-toolbar>
-    <div class="content" layout vertical>
-      <meteor-status status="{{metStatus}}"></meteor-status>
-  
-      <meteor-collection name="plaevents" ref="{{collection}}"></meteor-collection>
-  
-      <meteor-subscribe name="allevents" isready="{{subReady}}">
-      </meteor-subscribe>
-      <meteor-query id="query" options="{{options}}" query="{{query}}" data="{{allEvents}}">
-      </meteor-query>
-      <div>
-          <h2>
-             Events for {{collection._name}}
-          </h2>
-          Sub ready: {{subReady}}
-          <pla-event-list id="eventlist">
-          </pla-event-list>
-      </div>
-      <div horizontal center-justified layout>
-        <pla-chart data="{{events}}" heading="Testing d3">
-        </pla-chart>
-      </div>
+          <div>
+              <h2>
+                 Events for {{collection._name}}
+              </h2>
+              Sub ready: {{subReady}}
+              <pla-event-list id="eventlist" appFilter="{{appFilter}}">
+              </pla-event-list>
+          </div>
+          <div horizontal center-justified layout>
+            <pla-chart data="{{events}}" heading="Testing d3">
+            </pla-chart>
+          </div>
 
-      <div relative style="height: 300px; " id="svgdiv">
-      <pla-event collection="{{collection}}" plaEvent="{{selectedEvent}}">
-      </pla-event>
+          <div relative style="height: 300px; " id="svgdiv">
+          <pla-event collection="{{collection}}" plaEvent="{{selectedEvent}}">
+          </pla-event>
+          </div>
+        </div>
+        <div class="filtering" layout vertical>
+          <div class="filtering-row" layout horizontal>
+            <core-dropdown-menu label="Filter by app" class="dropdown-menu_primary">
+                <core-dropdown class="dropdown">
+                    <core-selector valueattr="label" selected="{{selectedApp}}">
+                      <core-item label="all"></core-item>
+                      <template repeat="{{app in apps}}">
+                        <core-item label="{{app.name}}" class="{{app.name}}"></core-item>
+                      </template>
+                    </core-selector>
+                </core-dropdown>
+            </core-dropdown-menu>
+          </div>
+          <div class="filtering-row" layout horizontal flex>
+            <div id="groups" class="filtering-column" layout vertical>
+              <div>
+              <span> Groups </span>
+              <core-selector id="group-selector" selected="{{selectedGroupAttr}}" selectedModel="{{selectedGroup}}" valueattr="data" vertical layout flex>
+                <template repeat="{{group in groups}}">
+                  <pla-group data="{{group}}" class="button_secondary">
+                  </pla-group>
+                </template>
+              </core-selector>
+              </div>
+            </div>
+            <div id="alumns" class="filtering-column" layout vertical>
+              <div>
+                <span> Alumns </span>
+                <template repeat="{{alumn in alumns}}">
+                  <pla-alumn data="{{alumn}}" class="button_secondary"></pla-alumn>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
     </core-scroll-header-panel>
   </template>
 
@@ -44,15 +107,41 @@
     Polymer('pla-test', {
       collection: null,
       subReady: false,
+      alumnsSubReady: false,
+      groupsSubReady: false,
+      appsSubReady: false,
+      appFilter: null,
       maxEvents: null,
       allEvents: null,
       selectedEvent: null,
       selectedId: null,
       metStatus: null,
       statusIcon: null,
+      groups: null,
+      groupsCollection: null,
+      groupsQueryOptions: null,
+      selectedGroup: null,
+      selectedGroupAttr: null,
+      alumns: null,
+      alumnsCollection: null,
+      appsCollection: null,
+      apps: null,
+      selectedApp: null,
+      publish: {
+        alumnsQueryOptions: null,
+        appsQueryOptions: null
+      },
       //query: {
       //   "header.application": "gcc"
       //},
+      created: function () {
+        console.log('pla-test created');
+        this.alumnsQueryOptions = {
+          sort: {
+            nia: -1
+          }
+        };
+      },
       options: {
         sort: {
           "header.Timestamp": -1
@@ -65,6 +154,18 @@
       selectedIdChanged: function () {
         this.selectedEvent = this.collection.findOne(this.selectedId);
       },
+      selectedGroupChanged: function () {
+        console.log('selectedGroup: ',this.selectedGroup);
+        console.log('selectedGroupAttr: ',JSON.stringify(this.selectedGroupAttr));
+        this.alumnsQuery={ _id: {$in: this.selectedGroup.group.members} };
+      },
+      selectedAppChanged: function () {
+        console.log('selectedApp: ',this.selectedApp);
+        if (this.selectedApp === 'all')
+          this.appFilter={};
+        else
+          this.appFilter={'header.application': this.selectedApp};
+      },
       subReadyChanged: function() {
         // wait subscribtion ready state before querying
         console.log('Subready changed');
@@ -74,6 +175,30 @@
           //console.log('Plaevents: ',this.plaevents);
           this.$.query.collection = this.collection;
           this.$.eventlist.collection = this.collection;
+        }
+      },
+      alumnsSubReadyChanged: function () {
+        if (this.alumnsSubReady && this.alumnsCollection) {
+          console.log('Alumns: ',this.alumnsCollection);
+          this.$.alumnsQuery.collection = this.alumnsCollection;
+          this.alumnsQueryOptions = {sort: { nia: -1}};
+
+        }
+      },
+      groupsSubReadyChanged: function () {
+        if (this.groupsSubReady && this.groupsCollection) {
+          console.log('Groups: ',this.groupsCollection);
+          this.$.groupsQuery.collection = this.groupsCollection;
+          this.groupsQueryOptions = {sort: { name: 1}};
+
+        }
+      },
+      appsSubReadyChanged: function () {
+        if (this.appsSubReady && this.appsCollection) {
+          console.log('Apps: ',this.appsCollection);
+          this.$.appsQuery.collection = this.appsCollection;
+          this.appsQueryOptions = {sort: { name: 1}};
+
         }
       },
       metStatusChanged: function () {

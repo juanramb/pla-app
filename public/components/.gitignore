@@ -1,4 +1,8 @@
-*
-!meteor
-!pla-test
+/*
+/*/
+!/pla-test/
+!/meteor/
 !.gitignore
+
+
+

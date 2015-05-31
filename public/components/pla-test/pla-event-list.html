@@ -18,7 +18,7 @@
 
     </style>
     
-    <meteor-query id="querylist" collection="{{collection}}" options="{{queryoptions}}" data="{{events}}">
+    <meteor-query id="querylist" query="{{eventsQuery}}" collection="{{collection}}" options="{{queryoptions}}" data="{{events}}">
     </meteor-query>
     <div layout vertical>
 
@@ -51,7 +51,9 @@
         //data: null,
         selectedEvent: null,
         maxEvents: 10,
-        queryoptions: null
+        queryoptions: null,
+        eventsQuery: {},
+        appFilter: null,
       },
       collection: null,
       events: null,
@@ -81,6 +83,11 @@
         };
         console.log('new queryoptions: ',this.queryoptions);
         console.log('meteor-query options: ',this.$.querylist.options);
+      },
+      appFilterChanged: function () {
+        console.log('appfilter changed to: ',this.appFilter);
+        this.eventsQuery = this.appFilter;
+        this.selectedEvent = {};
       },
       selectedEventChanged: function () {
         console.log('selectedEvent: ',this.selectedEvent);
