@@ -2,15 +2,57 @@
   <template>
     <style>
     </style>
-    <div id="{{data.nia}}">{{data.nia}}</div>
+    <div>
+    {{data.nia}}
+    <!--<span hidden="{{!(alumn.sourcesId.length > 0)}}"> -->
+    <core-icon-button icon="expand-more" on-click="{{toggle}}" hidden?="{{hideIcon}}">
+    </core-icon-button>
+    <div>
+    <core-collapse id="alumncollapse" opened="{{opened}}">
+      <div id="detail">
+        <div id="sources">
+          <core-selector id="sourceselector"  selectedItem="{{selectedSources}}" attr="data" multi>
+            <template repeat="{{source in data.sourcesId}}" id="sourcelist">
+              <div data="{{source}}">
+                <small>
+                  {{source}}
+                </small>
+              </div>
+            </template>
+          </core-selector>
+        </div>
+      </div>
+    </core-collapse>
+
   </template>
   <script>
     Polymer('pla-alumn', {
       collection: null,
+      opened: null,
+      hideIcon: null,
       publish: {
         data: null,
+        selectedSources: null,
         plaAlumnId: null
       },
+      created: function () {
+        this.opened=false;
+      },
+      dataChanged: function () {
+
+      },
+      ready: function() {
+        this.hideIcon = this.data.sourcesId ?
+          this.data.sourcesId.length == 0 : true;
+
+      },
+      toggle: function () {
+        console.log('toggle called');
+        console.log(this.$.alumncollapse);
+        console.log(this.$.alumncollapse.toggle);
+        //this.$.alumncollapse.toggle();
+        this.opened=!this.opened;
+      }
     });
   </script>
 </polymer-element>

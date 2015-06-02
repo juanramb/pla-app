@@ -51,7 +51,7 @@
                  Events for {{collection._name}}
               </h2>
               Sub ready: {{subReady}}
-              <pla-event-list id="eventlist" appFilter="{{appFilter}}">
+              <pla-event-list id="eventlist" appFilter="{{appFilter}}" sourceIdsFilter="{{sourceIdsFilter}}">
               </pla-event-list>
           </div>
           <div horizontal center-justified layout>
@@ -80,8 +80,10 @@
           <div class="filtering-row" layout horizontal flex>
             <div id="groups" class="filtering-column" layout vertical>
               <div>
-              <span> Groups </span>
-              <core-selector id="group-selector" selected="{{selectedGroupAttr}}" selectedModel="{{selectedGroup}}" valueattr="data" vertical layout flex>
+
+
+              <core-selector id="group-selector" selected="{{selectedGroup}}" valueattr="data" vertical layout flex multi>
+                <span data="" id="groupsheader" onclick="{{clearSelectedGroup}}"> Groups </span>
                 <template repeat="{{group in groups}}">
                   <pla-group data="{{group}}" class="button_secondary">
                   </pla-group>
@@ -92,9 +94,11 @@
             <div id="alumns" class="filtering-column" layout vertical>
               <div>
                 <span> Alumns </span>
+                <core-selector id="alumn-selector" selected="{{selectedAlumns}}" valueattr="data" vertical layout flex multi>
                 <template repeat="{{alumn in alumns}}">
                   <pla-alumn data="{{alumn}}" class="button_secondary"></pla-alumn>
                 </template>
+                </core-selector>
               </div>
             </div>
           </div>
@@ -111,6 +115,7 @@
       groupsSubReady: false,
       appsSubReady: false,
       appFilter: null,
+      sourceIdsFilter: null,
       maxEvents: null,
       allEvents: null,
       selectedEvent: null,
@@ -124,9 +129,12 @@
       selectedGroupAttr: null,
       alumns: null,
       alumnsCollection: null,
+      selectedAlumns: null,
+      selectedAlumnsAttr: null,
       appsCollection: null,
       apps: null,
       selectedApp: null,
+      selectedSourceIds: null,
       publish: {
         alumnsQueryOptions: null,
         appsQueryOptions: null
@@ -157,7 +165,40 @@
       selectedGroupChanged: function () {
         console.log('selectedGroup: ',this.selectedGroup);
         console.log('selectedGroupAttr: ',JSON.stringify(this.selectedGroupAttr));
-        this.alumnsQuery={ _id: {$in: this.selectedGroup.group.members} };
+        if (this.selectedGroup && this.selectedGroup.length > 0) {
+          var members = this.selectedGroup.reduce(function (prev,next) {
+            console.log('next:',next);
+            if (prev && next && next.members) {
+              return prev.concat(next.members)
+            } else {
+              return next.members;
+            }
+          },[])
+          console.log('members: ',members);
+          this.alumnsQuery={ _id: {$in: members} };
+        } else if (this.selectedGroup && this.selectedGroup.group) {
+          this.alumnsQuery={ _id: {$in: this.selectedGroup.group.members} };
+        } else {
+          this.alumnsQuery={};
+        }
+      },
+      clearSelectedGroup: function () {
+        console.log('clearing selected gruop');
+        this.$['group-selector'].selected=null;
+      },
+      selectedAlumnsChanged: function () {
+        console.log('selectedGroup: ',this.selectedGroup);
+        console.log('selectedAlumns: ',this.selectedAlumns);
+        if (this.selectedAlumns) {
+          var sourceIds = this.selectedAlumns.reduce(function (prev,next) {
+            if (prev && next.sourcesId)
+              return prev.concat(next.sourcesId);
+            else 
+              return prev;
+          },[]);
+          console.log('selected alumns sourcesId:', sourceIds);
+          this.selectedSourceIds = sourceIds;
+        }
       },
       selectedAppChanged: function () {
         console.log('selectedApp: ',this.selectedApp);
@@ -165,6 +206,27 @@
           this.appFilter={};
         else
           this.appFilter={'header.application': this.selectedApp};
+      },
+      alumnsChanged: function () {
+        if ( this.selectedAlumns ) 
+          this.selectedAlumns = null;
+        console.log('alumns changed to length: ',this.alumns.length);
+        var sourceIds = this.alumns.reduce(function (prev,next) {
+          if (prev && next.sourcesId)
+            return prev.concat(next.sourcesId);
+          else 
+            return prev;
+        },[]);
+        console.log('selected alumns sourcesId:', sourceIds);
+        this.selectedSourceIds = sourceIds;
+      },
+      selectedSourceIdsChanged: function () {
+        if (this.selectedSourceIds && this.selectedSourceIds.length > 0) {
+          this.sourceIdsFilter = {'sourceId': {$in: this.selectedSourceIds}};
+          console.log('changing sourceIdsFilter to: ', this.sourceIdsFilter);
+        } else {
+          this.sourceIdsFilter = {};
+        }
       },
       subReadyChanged: function() {
         // wait subscribtion ready state before querying

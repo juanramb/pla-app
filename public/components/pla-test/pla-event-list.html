@@ -53,6 +53,7 @@
         maxEvents: 10,
         queryoptions: null,
         eventsQuery: {},
+        sourceIdsFilter: null,
         appFilter: null,
       },
       collection: null,
@@ -85,9 +86,37 @@
         console.log('meteor-query options: ',this.$.querylist.options);
       },
       appFilterChanged: function () {
+        this.events = [];
         console.log('appfilter changed to: ',this.appFilter);
-        this.eventsQuery = this.appFilter;
+        var newFilter = {};
+        for (var key in this.eventsQuery) {
+          newFilter[key] = this.eventsQuery[key];
+        }
+        for (var key in this.appFilter) {
+          newFilter[key] = this.appFilter[key];
+        }
+        if ( Object.keys(this.appFilter).length === 0 )
+          delete newFilter['header.application'];
+
+        this.eventsQuery = newFilter;
+        console.log('changing eventsQuery to: ',this.eventsQuery);
         this.selectedEvent = {};
+      },
+      sourceIdsFilterChanged: function () {
+        this.events = [];
+        console.log('sourceIdsFilter changed to: ', this.sourceIdsFilter);
+        console.log('this.eventsQuery was: ', this.eventsQuery);
+        var newFilter = {};
+        for (var key in this.eventsQuery) {
+          newFilter[key] = this.eventsQuery[key];
+        }
+        for (var key in this.sourceIdsFilter) {
+          newFilter[key] = this.sourceIdsFilter[key];
+        }
+        if (Object.keys(this.sourceIdsFilter).length === 0)
+          delete newFilter.sourceId;
+        this.eventsQuery = newFilter;
+        console.log('this.eventsQuery changed to: ', this.eventsQuery);
       },
       selectedEventChanged: function () {
         console.log('selectedEvent: ',this.selectedEvent);
