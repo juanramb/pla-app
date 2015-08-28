@@ -1,0 +1,34 @@
+{
+  "useShadowDom": false,
+  "imports": [
+    "/components/polymer/polymer.html",
+    "/components/meteor-elements/meteor-connection.html",
+    "/components/meteor-elements/meteor-collection.html",
+    "/components/meteor-elements/meteor-query.html",
+    "/components/meteor-elements/meteor-subscribe.html",
+    "/components/iron-icons/iron-icons.html",
+    "/components/iron-selector/iron-selector.html",
+    "/components/paper-drawer-panel/paper-drawer-panel.html",
+    "/components/paper-header-panel/paper-header-panel.html",
+    "/components/paper-toolbar/paper-toolbar.html",
+    "/components/paper-menu/paper-menu.html",
+    "/components/paper-slider/paper-slider.html",
+    "/components/paper-icon-button/paper-icon-button.html",
+    "/components/paper-item/paper-item.html",
+    "/components/paper-input/paper-input.html",
+    "/components/paper-button/paper-button.html",
+    "/components/paper-checkbox/paper-checkbox.html",
+    "/components/paper-dropdown-menu/paper-dropdown-menu.html",
+    "/components/pla-app/pla-event.html",
+    "/components/pla-app/pla-group.html",
+    "/components/pla-app/pla-alumn.html",
+    "/components/pla-app/pla-chart.html",
+    "/components/pla-app/pla-event-list.html",
+    "/components/pla-app/pla-app.html"
+    ],
+    "noimport": [
+
+
+
+    ]
+}

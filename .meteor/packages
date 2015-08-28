@@ -7,7 +7,14 @@
 meteor-platform
 insecure
 mquandalle:bower
-differential:vulcanize
+differential:vulcanize@2.0.0
 d3js:d3
 
 
+accounts-google
+accounts-password
+service-configuration
+accounts-ui
+useraccounts:polymer
+iron:router
+useraccounts:iron-routing

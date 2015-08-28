@@ -18,7 +18,13 @@ html /deep/ a {
   text-decoration: none; }
 html /deep/ svg {
   fill: currentColor; }
-
+html, body {
+  height: 100%;
+  margin: 0;
+}
+paper-scroll-header-panel {
+  height: 100%;
+}
 /**
  * Retrieves a font name from the $roboto-fonts Sass map
  *

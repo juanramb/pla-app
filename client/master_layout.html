@@ -1,0 +1,12 @@
+<template name="masterLayout">
+  <paper-scroll-header-panel class="flex" condenses>   <!-- class="flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+
+  {{> yield region='nav'}}
+
+  <div id="content" class="content layout horizontal" >
+    {{> yield}}
+  </div>
+  {{> yield region='footer'}}
+  </paper-scroll-header-panel>
+
+</template>
