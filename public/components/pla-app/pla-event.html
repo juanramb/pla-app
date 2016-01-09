@@ -1,0 +1,156 @@
+<!-- <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"> add  to top with other imports  -->
+<link rel="import" href="../polymer/polymer.html">
+<dom-module id="pla-event">
+   <!-- TODO Move style tags here from <template> if needed CONVERTED WIP -->
+
+  <template class="{{app}}">
+    <style>
+        .gcc {
+          background: #34b0f1;
+        }
+        .svn {
+          background: #f17782;
+        }
+        .valgrind {
+          background: #63dd6e;
+        }
+        .kate {
+          background: orange;
+        }
+        .event-detail {
+          height: 700px;
+          width: 100%;
+        }
+        .event-body {
+          padding: 10px;
+          background-color: white;
+          height: 500px;
+        }
+    </style>
+    <div class$="{{appClass()}}">Has header <span>{{hasHeader}}</span></div>
+    <template is="dom-if" if="{{hasHeader}}">
+        <div class="flex layout vertical" hidden$="{{detailed}}" >   <!-- class="flex layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+             <!-- class="flex layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+            <div id="event" class="appClasses('flex horizontal')">   <!-- class="flex horizontal"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+              <template is="dom-if" if="{{!detailed}}">
+        <!-- TODO fix if=,   CONVERTED WIP -->
+                <span flex></span>   <!-- class="flex</span>"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+              </template>
+
+              <paper-tooltip for="event" class="flex layout vertical">
+                <div tip>
+                  <span>{{data.header.Timestamp}}</span> :
+                  <span class="{{app}}">{{data.header.application}}</span> :
+                    <span>{{data._id}}</span> <br/>
+                    <br/>
+                    <span>{{data.eventId}}</span>
+                </div>
+              </paper-tooltip>
+            </div>
+        </div>
+      <template is="dom-if" if="{{detailed}}">
+        <!-- TODO fix if=,   CONVERTED WIP -->
+        <span>{{plaEventKeys}}</span>
+        <div class="appClasses('event-detail layout vertical')" >   <!-- class="layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+          <div class="event-header">
+            <ul>
+              <template is="dom-repeat" items="{{plaEventKeys}}">
+                  <li hidden$="{{itemIsBody(item)}}">
+                    <span>{{item}}</span> : <span>{{dataProp(item)}}</span>
+                  </li>
+              </template>
+            </ul>
+          </div>
+          <div class="event-body">
+            <span>
+              <pre><span>{{data.body}}</span></pre>
+            </span>
+          </div>
+        </div>
+      </template>
+    </template>
+  </template>
+  <script>
+    Polymer( {
+      is: 'pla-event', // CONVERTED WIP
+      properties: {
+        collection : Object,
+        data : {
+          type: Object,
+          value: null,
+          observer: 'plaEventChanged'
+        },
+        hasHeader: {
+          type: Boolean,
+          computed: 'headerPresent(data.header)'
+        },
+        plaEventKeys: {
+          type: Array,
+          computed: 'getKeys(data)'
+        },
+        plaEventId: String,
+        detailed: {
+          type: Boolean,
+          value: false
+        },
+        app: {
+          type: String,
+          computed: 'getApp(data)'
+        }
+      },
+      appClasses: function(classes) {
+        return this.app+' '+classes;
+      },
+      appClass: function() {
+        return this.app;
+      },
+      itemIsBody: function(item) {
+        return item == 'body';
+      },
+      dataProp: function(prop) {
+        return this.data[prop];
+      },
+      getKeys: function (obj) {
+        if (obj)
+          return Object.keys(obj);
+        else
+          return [];
+
+      },
+      getApp: function (obj) {
+        return (obj && obj.header) ? obj.header.application : '';
+      },
+      headerPresent: function (header) {
+        console.log("header present:",(typeof header !== 'undefined') );
+        return typeof header !== 'undefined';
+      },
+      plaEventChanged : function(newValue, oldValue) {
+        //console.log('Pla event changed to: ', newValue);
+        if (newValue && newValue.header) {
+          this.plaEventKeys = Object.keys(newValue);
+          this.app = newValue.header.application;
+        }
+      }
+    });
+  </script>
+</dom-module> <!-- CONVERTED -->
+
+
+<!-- CONVERSION NOTES TODO:
+ Review code and look for:
+ - textContent binding from <div>First: {{first}}</div> TO First <span>{{first}}</span><br>
+ - polymer-element default attributes such as tabindex="0" move to hostAttributes: {  tabindex: 0}
+ - custom elements correct JSON quotes required, change from <my-element foo="{ 'title': 'Persuasion', 'author': 'Austen' }"> to </my-element> to <my-element foo="{ "title": "Persuasion", "author": "Austen" }"></my-element>
+ - custom elements attribute use dash-case not camelCase, change from  <my-element fooBar= to <my-element foo-bar
+ - Polymer( fix mixins use Behaviors after is: see https://www.polymer-project.org/1.0/docs/devguide/behaviors.html
+ - Check layout attributes replaced by layout classes <div layout horizontal center>` to `<div class="layout horizontal center">,
+ - Cleanup class=
+ - Convert core- to iron- or paper- replacement elements at PolymerElements
+ - Remove unresolved from <body> tag
+ - Cleanup iron-ajax params url for embedded bindings {{}}
+ - iron-ajax replace this.$.xxx_ajax.abort(); and this.$.xxx_ajax.go(); with this.$.xxx_ajax.generateRequest()
+ - Fix iron-list if needed
+ - Fix indentation as need
+ - Cleanup Comments to reflect changes ,
+ - see https://www.polymer-project.org/1.0/docs/migration.html
+   -->

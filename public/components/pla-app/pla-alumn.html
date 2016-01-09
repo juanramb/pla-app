@@ -1,0 +1,85 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module id="pla-alumn"> <!-- CONVERTED WIP -->
+
+  <style>
+  </style>
+
+  <template>
+    <div>
+      <span>{{alumn.nia}}</span>
+      <paper-icon-button icon="expand-more" on-click="{{toggle}}" hidden$="{{hideIcon}}">
+      </paper-icon-button>
+    </div>
+    <iron-collapse id="alumncollapse" opened="{{opened}}">
+      <div id="detail">
+        <div id="sources">
+          <iron-selector id="sourceselector"  selected-values="{{selectedSources}}" attr="sid" multi>
+            <template is="dom-repeat" items="{{alumn.sourcesId}}" id="sourcelist">
+              <div sid="{{item}}">
+                <small>{{item}}</small>
+              </div>
+            </template>
+          </iron-selector>
+        </div>
+      </div>
+    </iron-collapse>
+
+  </template>
+  <script>
+    Polymer( {
+      is: 'pla-alumn', // CONVERTED WIP
+      properties: {
+        opened: {
+          type: Boolean,
+          value: false
+        },
+        hideIcon: Boolean,
+        alumn: {
+          type: Object,
+          observer: 'alumnChanged'
+        },
+        selectedSources: Array,
+        plaAlumnId: String
+      },
+      created: function () {
+      },
+      alumnChanged: function () {
+        this.hideIcon = this.alumn.sourcesId ?
+          this.alumn.sourcesId.length == 0 : true;
+      },
+      ready: function() {
+        if (this.alumn.sourcesId)
+          console.log('Alumn %s has %d sources', this.alumn.nia, this.alumn.sourcesId.length);
+        this.hideIcon = this.alumn.sourcesId ?
+          this.alumn.sourcesId.length == 0 : true;
+      },
+      toggle: function () {
+        console.log('toggle called');
+        console.log(this.$.alumncollapse);
+        console.log(this.$.alumncollapse.toggle);
+        //this.$.alumncollapse.toggle();
+        this.opened=!this.opened;
+      }
+    });
+  </script>
+</dom-module> <!-- CONVERTED -->
+
+
+<!-- CONVERSION NOTES TODO:
+ Review code and look for:
+ - textContent binding from <div>First: {{first}}</div> TO First <span>{{first}}</span><br>
+ - polymer-element default attributes such as tabindex="0" move to hostAttributes: {  tabindex: 0}
+ - custom elements correct JSON quotes required, change from <my-element foo="{ 'title': 'Persuasion', 'author': 'Austen' }"> to </my-element> to <my-element foo="{ "title": "Persuasion", "author": "Austen" }"></my-element>
+ - custom elements attribute use dash-case not camelCase, change from  <my-element fooBar= to <my-element foo-bar
+ - Polymer( fix mixins use Behaviors after is: see https://www.polymer-project.org/1.0/docs/devguide/behaviors.html
+ - Check layout attributes replaced by layout classes <div layout horizontal center>` to `<div class="layout horizontal center">,
+ - Cleanup class=
+ - Convert core- to iron- or paper- replacement elements at PolymerElements
+ - Remove unresolved from <body> tag
+ - Cleanup iron-ajax params url for embedded bindings {{}}
+ - iron-ajax replace this.$.xxx_ajax.abort(); and this.$.xxx_ajax.go(); with this.$.xxx_ajax.generateRequest()
+ - Fix iron-list if needed
+ - Fix indentation as need
+ - Cleanup Comments to reflect changes ,
+ - see https://www.polymer-project.org/1.0/docs/migration.html
+   -->

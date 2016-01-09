@@ -1,0 +1,366 @@
+<!-- <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"> add  to top with other imports  -->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../pla-app/app-theme.html">
+<dom-module id='pla-app'> <!-- CONVERTED WIP -->
+
+<style include="shared-styles">
+    .filtering {
+      margin: 10px;
+      padding: 5px;
+    }
+    .iron-selected {
+      opacity: 0.5;
+      background-color: grey;
+    }
+    .filtering-column {
+      margin: 10px;
+    }
+</style> <!-- TODO Move style tags here from <template> if needed CONVERTED WIP -->
+
+<template>
+  <meteor-connection connected="{{metConnected}}"></meteor-connection>
+
+  <meteor-collection name="plaevents" _ref={{eventsCollection}}>
+    <meteor-query id="query" options="{{eventsQueryOptions}}" enable="{{eventsSubReady}}" query="{{eventsQuery}}" data="{{allEvents}}">
+    </meteor-query>
+  </meteor-collection>
+
+  <meteor-collection name="alumns">
+    <meteor-query id="alumnsQuery" enable="{{alumnsSubReady}}" query="{{alumnsQuery}}" options="{{alumnsQueryOptions}}" data="{{alumns}}">
+    </meteor-query>
+  </meteor-collection>
+  <meteor-collection name="groups">
+    <meteor-query id="groupsQuery" enable="{{groupsSubReady}}" options="{{groupsQueryOptions}}" data="{{groups}}">
+    </meteor-query>
+  </meteor-collection>
+  <meteor-collection name="apps" _ref="{{appsCollection}}">
+    <meteor-query id="appsQuery" enable="{{appsSubReady}}" query="{{appsQuery}}" options="{{appsQueryOptions}}" data="{{apps}}">
+    </meteor-query>
+  </meteor-collection>
+
+  <meteor-subscribe name="allevents" isready="{{eventsSubReady}}">
+  </meteor-subscribe>
+  <meteor-subscribe name="allalumns" isready="{{alumnsSubReady}}">
+  </meteor-subscribe>
+  <meteor-subscribe name="allgroups" isready="{{groupsSubReady}}">
+  </meteor-subscribe>
+  <meteor-subscribe name="allapps" isready="{{appsSubReady}}">
+  </meteor-subscribe>
+  <div id="app" class="layout horizontal">
+    <div id="events" class="layout vertical flex">   <!-- class="layout vertical flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+
+      <div>
+        <h2>
+          Events for <span>{{eventsCollection._name}}</span>
+        </h2>
+        Sub ready: <span>{{eventsSubReady}}</span>
+        <pla-event-list id="eventlist" appFilter="{{appFilter}}" sourceIdsFilter="{{sourceIdsFilter}}" query="{{eventsQuery}}" events="{{allEvents}}">
+        </pla-event-list>
+      </div>
+      <div class="horizontal center-justified layout">   <!-- class="horizontal center-justified layout"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+        <!--<google-chart
+          cols='[{"label": "Data", "type": "string"},{"label": "Value", "type": "number"}]'
+          rows='[["Something", 1]]'>
+        </google-chart>
+        -->
+        <!--       
+          <google-chart
+            id='events-chart'
+            type='column'
+            cols='[{"label": "Time", "type": "datetime", {"label": "Event", "type": "number"}]'
+            rows='[["Date(2016,1,1,0,1)",1], ["Date(2016,1,1,0,2)",1]]'>
+          </google-chart>
+        -->
+            
+            
+
+        <div class="relative" style="height: 300px; " id="svgdiv">   <!-- class="relative"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+          <!--<pla-event data="{{selectedEvent}}">
+          </pla-event>-->
+        </div>
+      </div>
+    </div>
+      <div class="filtering layout vertical" >
+        <div class="filtering-row layout horizontal" >   <!-- class="layout horizontal"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+          <paper-dropdown-menu label="Filter by app">
+            <paper-menu class="dropdown-content" label="Filter by app">
+              <iron-selector valueattr="label" selected="{{selectedApp}}">
+                <paper-item label="all">All <span>{{apps.length}}</span> </paper-item>
+                <template is="dom-repeat" items="{{apps}}">
+                  <paper-item label="{{item.name}}" class="{{item.name}}">{{item.name}}</paper-item>
+                </template>
+              </iron-selector>
+            </paper-menu>
+          </paper-dropdown-menu>
+        </div>
+        <div class="filtering-row layout horizontal flex" >   <!-- class="layout horizontal flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+          <div id="groups" class="filtering-column layout vertical" >   <!-- class="layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+            <div class="vertical layout flex">
+                <div id="groupsheader" on-click="clearSelectedGroup" class="layout horizontal">
+                  <span>Groups</span>
+                  <paper-badge for="groupsheader" label="{{groups.length}}"></paper-badge>
+                </div>
+                <iron-selector id="group-selector" selected-values="{{selectedGroup}}" attr-for-selected="group" class="vertical layout flex" multi>   <!-- class="vertical layout flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+                  <template is="dom-repeat" items="{{groups}}">
+                    <pla-group group="{{item}}">
+                    </pla-group>
+                  </template>
+                </iron-selector>
+            </div>
+          </div>
+          <div id="alumns" class="filtering-column layout vertical" >   <!-- class="layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+            <div>
+                <div data="" id="alumnsheader" on-click="clearSelectedAlumn" class="layout horizontal">
+                   <span>Alumns</span>
+                   <paper-badge for="alumnsheader" label="{{alumns.length}}"></paper-badge>
+                </div>
+              <iron-selector id="alumn-selector" selected-values="{{selectedAlumns}}" attr-for-selected="alumn" class="vertical layout flex" multi>   <!-- class="vertical layout flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+                <template is="dom-repeat" items="{{alumns}}">
+                  <pla-alumn alumn="{{item}}" class="button_secondary"></pla-alumn>
+                </template>
+              </iron-selector>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    Polymer( {
+      is: 'pla-app', // CONVERTED WIP
+      properties: {
+        eventsCollection: Object,
+        subReady: {
+          type: Boolean,
+          observer: 'subReadyChanged'
+        },
+        alumnsSubReady: Boolean,
+        groupsSubReady: Boolean,
+        appsSubReady: Boolean,
+        appFilter: String,
+        sourceIdsFilter: String,
+        maxEvents: Number,
+        allEvents: Array,
+        selectedEvent: Object,
+        selectedId: {
+          type: String,
+          observer: 'selectedIdChanged'
+        },
+        metConnected: {
+          type: Boolean,
+          observer: 'metConnectedChanged'
+        },
+        status : {
+          type: Object,
+          notify: true,
+          value: function () {
+            return {
+              icon: 'cloud-off',
+              connected: false
+            };
+          },
+          readOnly: false
+        },
+        mierder: {
+          type: String,
+          value: 'mierder'
+        },
+        statusIcon: {
+          type: String,
+          notify: true,
+          readOnly: false
+        },
+        groups: Array,
+        groupsCollection: Object,
+        groupsQueryOptions: {
+          type: Object,
+          value: {sort: { name: 1}}
+        },
+        selectedGroup: {
+          type: Object,
+          observer: 'selectedGroupChanged'
+        },
+        selectedGroupAttr: String,
+        alumns: {
+          type: Array,
+          observer: 'alumnsChanged'
+        },
+        alumnsCollection: Object,
+        selectedAlumns: {
+          type: Array,
+          observer: 'selectedAlumnsChanged'
+        },
+        selectedAlumnsAttr: Array,
+        appsCollection: Object,
+        apps: Array,
+        selectedApp: {
+          type: Object,
+          observer: 'selectedAppChanged'
+        },
+        selectedSourceIds: {
+          type: Array,
+          observer: 'selectedSourceIdsChanged'
+        },
+        alumnsQuery: {
+          type: Object,
+          value: {}
+        },
+        alumnsQueryOptions: {
+          type: Object,
+          value: {
+            sort: {
+              nia: -1
+            }
+          }
+        },
+        appsQueryOptions: {
+          type: Object,
+          value: {sort: { name: 1}}
+        },
+        //query: {
+        //   "header.application": "gcc"
+        //},
+        eventsQueryOptions: {
+          type: Object,
+          value: {
+            sort: {
+              "header.Timestamp": -1
+            },
+            limit: 10
+          },
+          observer: 'eventsQueryOptionsChanged'
+        }
+      },
+      created: function () {
+        console.log('pla-app created');
+
+      },
+      eventsQueryOptionsChanged: function (newValue, oldValue) {
+        console.log('on pla-app, eventsQueryOptions changed to: ',newValue);
+      },
+      selectedIdChanged: function () {
+        this.selectedEvent = this.collection.findOne(this.selectedId);
+      },
+      selectedGroupChanged: function (newValue, oldValue) {
+        console.log('selectedGroup: ',this.selectedGroup);
+        console.log('selectedGroupAttr: ',JSON.stringify(this.selectedGroupAttr));
+        if (this.selectedGroup && this.selectedGroup.length > 0) {
+          var members = this.selectedGroup.reduce(function (prev,next) {
+            console.log('next:',next);
+            if (prev && next && next.members) {
+              return prev.concat(next.members)
+            } else {
+              return next.members;
+            }
+          },[])
+          console.log('members: ',members);
+          this.alumnsQuery={ _id: {$in: members} };
+        } else if (this.selectedGroup && this.selectedGroup.group) {
+          this.alumnsQuery={ _id: {$in: this.selectedGroup.group.members} };
+        } else {
+          this.alumnsQuery={};
+        }
+      },
+
+      clearSelectedGroup: function () {
+        console.log('clearing selected gruop');
+        this.$['group-selector'].selected=null;
+        this.selectedGroup=null;
+      },
+      selectedAlumnsChanged: function () {
+        console.log('selectedGroup: ',this.selectedGroup);
+        console.log('selectedAlumns: ',this.selectedAlumns);
+        if (this.selectedAlumns) {
+          var sourceIds = this.selectedAlumns.reduce(function (prev,next) {
+            if (prev && next.sourcesId)
+              return prev.concat(next.sourcesId);
+            else
+              return prev;
+          },[]);
+          console.log('selected alumns sourcesId:', sourceIds);
+          this.selectedSourceIds = sourceIds;
+        }
+      },
+      selectedAppChanged: function () {
+        console.log('selectedApp: ',this.selectedApp);
+        if (this.selectedApp === 'all')
+          this.appFilter={};
+        else
+          this.appFilter={'header.application': this.selectedApp};
+      },
+      alumnsChanged: function (newAlumns, oldAlumns) {
+        if ( this.selectedAlumns )
+          this.selectedAlumns = null;
+
+        if (oldAlumns)
+          console.log('alumns changed from length: ',oldAlumns.length);
+        console.log('alumns changed to length: ',newAlumns.length);
+        var sourceIds = newAlumns.reduce(function (prev,next) {
+          if (prev && next.sourcesId)
+            return prev.concat(next.sourcesId);
+          else
+            return prev;
+        },[]);
+        console.log('selected alumns sourcesId:', sourceIds);
+        this.selectedSourceIds = sourceIds;
+      },
+      selectedSourceIdsChanged: function () {
+        if (this.selectedSourceIds && this.selectedSourceIds.length > 0) {
+          this.sourceIdsFilter = {'sourceId': {$in: this.selectedSourceIds}};
+          console.log('changing sourceIdsFilter to: ', this.sourceIdsFilter);
+        } else {
+          this.sourceIdsFilter = {};
+        }
+      },
+      subReadyChanged: function() {
+        // wait subscribtion ready state before querying
+        console.log('Subready changed');
+        if (this.subReady && this.collection) {
+          console.log('Collection: ',this.collection);
+          //this.plaevents=this.collection.find();
+          //console.log('Plaevents: ',this.plaevents);
+        }
+      },
+      alumnsSubReadyChanged: function () {
+
+      },
+      groupsSubReadyChanged: function () {
+
+      },
+      appsSubReadyChanged: function () {
+
+      },
+      metConnectedChanged: function (newValue, oldValue) {
+        console.log('connected changed to: ',newValue);
+        this.properties.status.connected = newValue;
+        this.properties.status.icon = newValue ? 'cloud-done' : 'cloud-off';
+      },
+      _getStatusIcon: function (connected) {
+        return connected? 'cloud-done': 'cloud-off';
+      }
+
+    });
+  </script>
+</dom-module> <!-- CONVERTED -->
+
+
+
+<!-- CONVERSION NOTES TODO:
+ Review code and look for:
+ - textContent binding from <div>First: {{first}}</div> TO First <span>{{first}}</span><br>
+ - polymer-element default attributes such as tabindex="0" move to hostAttributes: {  tabindex: 0}
+ - custom elements correct JSON quotes required, change from <my-element foo="{ 'title': 'Persuasion', 'author': 'Austen' }"> to </my-element> to <my-element foo="{ "title": "Persuasion", "author": "Austen" }"></my-element>
+ - custom elements attribute use dash-case not camelCase, change from  <my-element fooBar= to <my-element foo-bar
+ - Polymer( fix mixins use Behaviors after is: see https://www.polymer-project.org/1.0/docs/devguide/behaviors.html
+ - Check layout attributes replaced by layout classes <div layout horizontal center>` to `<div class="layout horizontal center">,
+ - Cleanup class=
+ - Convert core- to iron- or paper- replacement elements at PolymerElements
+ - Remove unresolved from <body> tag
+ - Cleanup iron-ajax params url for embedded bindings {{}}
+ - iron-ajax replace this.$.xxx_ajax.abort(); and this.$.xxx_ajax.go(); with this.$.xxx_ajax.generateRequest()
+ - Fix iron-list if needed
+ - Fix indentation as need
+ - Cleanup Comments to reflect changes ,
+ - see https://www.polymer-project.org/1.0/docs/migration.html
+   -->

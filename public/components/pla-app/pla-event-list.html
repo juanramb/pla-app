@@ -1,0 +1,173 @@
+<!-- <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"> add  to top with other imports  -->
+<link rel="import" href="../polymer/polymer.html">
+<dom-module id='pla-event-list'  > <!-- CONVERTED WIP -->
+
+  <template>
+    <style>
+      .event-container {
+        height: 200px;
+        background: white;
+      }
+      .event {
+        height: 150px;
+        margin: 5px;
+      }
+      .core-selected {
+        opacity: 0.5;
+      }
+      .event-detailed {
+        height: 700px;
+      }
+
+    </style>
+
+    <div class="layout vertical">   <!-- class="layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+
+      <div class="layout horizontal">   <!-- class="layout horizontal"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+        <p>Use slider to select events shown</p>
+        <paper-slider class="center" snaps pin secondaryprogress="5" editable value="{{maxEvents}}" min="5" id="paper_slider">
+        </paper-slider>
+      </div>
+      <div>
+        Number of events: <span>{{events.length}}</span> </br>
+        <paper-spinner id="spinner">
+      </div>
+      <div class="event-container horizontal layout center" >   <!-- class="horizontal layout center"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+        <iron-selector id="selector" selected="{{selectedEvent}}" valueattr="data" class="horizontal layout center flex">   <!-- class="horizontal layout center flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+        <template is="dom-repeat" items="{{events}}">
+      <!-- TODO fix repeat, replace data, remove extra ="{{key in keys}}"   CONVERTED WIP -->
+          <pla-event class="event flex" data="{{item}}" >   <!-- class="flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+          </pla-event>
+        </template>
+        </iron-selector>
+      </div>
+      <div class="horizontal center-justified layout">   <!-- class="horizontal center-justified layout"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+        <pla-event class="event-detail flex" data="{{detailedEvent}}" detailed>   <!-- class="flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+        </pla-event>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer( {
+      is: 'pla-event-list', // CONVERTED WIP
+      properties: {
+        //data: null,
+        selectedEvent: {
+          type: Number,
+          observer: 'selectedEventChanged'
+        },
+        detailedEvent: {
+          type: Object,
+          value: null
+        },
+        maxEvents: {
+          type: Number,
+          value: 10,
+          observer: 'maxEventsChanged'
+        },
+        eventsQuery: {
+          type: Object
+        },
+        sourceIdsFilter: {
+          type: Object,
+          observer: 'sourceIdsFilterChanged'
+        },
+        appFilter: {
+          type: Object,
+          observer: 'appFilterChanged'
+        },
+        events: {
+          type: Array,
+          observer: 'eventsChanged'
+        },
+        query: {
+          type: Object,
+          value: {
+            sort: {
+              "header.Timestamp": -1
+            },
+            limit: this.maxEvents
+          }
+        }
+      },
+
+      created: function () {
+
+      },
+      eventsChanged: function () {
+        this.$.spinner.active = true;
+        this.debounce('evtchanged', function () {
+
+          this.$.spinner.active = false;
+        });
+      },
+      maxEventsChanged: function() {
+        console.log('In event-list Changing maxEvents to: '+this.maxEvents);
+        console.log('In event-list old query: ',this.query);
+        this.query = {
+          sort: {
+            "header.Timestamp": -1
+          },
+          limit: this.maxEvents
+        };
+        console.log('new query: ',this.query);
+      },
+      appFilterChanged: function () {
+        this.events = [];
+        console.log('appfilter changed to: ',this.appFilter);
+        var newFilter = {};
+        for (var key in this.query) {
+          newFilter[key] = this.query[key];
+        }
+        for (var key in this.appFilter) {
+          newFilter[key] = this.appFilter[key];
+        }
+        if ( Object.keys(this.appFilter).length === 0 )
+          delete newFilter['header.application'];
+
+        this.query = newFilter;
+        console.log('changing query to: ',this.query);
+        this.selectedEvent = {};
+      },
+      sourceIdsFilterChanged: function () {
+        this.events = [];
+        console.log('sourceIdsFilter changed to: ', this.sourceIdsFilter);
+        console.log('this.query was: ', this.query);
+        var newFilter = {};
+        for (var key in this.query) {
+          newFilter[key] = this.query[key];
+        }
+        for (var key in this.sourceIdsFilter) {
+          newFilter[key] = this.sourceIdsFilter[key];
+        }
+        if (Object.keys(this.sourceIdsFilter).length === 0)
+          delete newFilter.sourceId;
+        this.query = newFilter;
+        console.log('this.query changed to: ', this.query);
+      },
+      selectedEventChanged: function (newValue, oldValue) {
+        this.detailedEvent = this.events[newValue];
+      }
+    });
+  </script>
+</dom-module> <!-- CONVERTED -->
+
+
+<!-- CONVERSION NOTES TODO:
+ Review code and look for:
+ - textContent binding from <div>First: {{first}}</div> TO First <span>{{first}}</span><br>
+ - polymer-element default attributes such as tabindex="0" move to hostAttributes: {  tabindex: 0}
+ - custom elements correct JSON quotes required, change from <my-element foo="{ 'title': 'Persuasion', 'author': 'Austen' }"> to </my-element> to <my-element foo="{ "title": "Persuasion", "author": "Austen" }"></my-element>
+ - custom elements attribute use dash-case not camelCase, change from  <my-element fooBar= to <my-element foo-bar
+ - Polymer( fix mixins use Behaviors after is: see https://www.polymer-project.org/1.0/docs/devguide/behaviors.html
+ - Check layout attributes replaced by layout classes <div layout horizontal center>` to `<div class="layout horizontal center">,
+ - Cleanup class=
+ - Convert core- to iron- or paper- replacement elements at PolymerElements
+ - Remove unresolved from <body> tag
+ - Cleanup iron-ajax params url for embedded bindings {{}}
+ - iron-ajax replace this.$.xxx_ajax.abort(); and this.$.xxx_ajax.go(); with this.$.xxx_ajax.generateRequest()
+ - Fix iron-list if needed
+ - Fix indentation as need
+ - Cleanup Comments to reflect changes ,
+ - see https://www.polymer-project.org/1.0/docs/migration.html
+   -->

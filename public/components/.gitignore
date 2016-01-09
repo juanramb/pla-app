@@ -1,6 +1,7 @@
 /*
 /*/
 !/pla-test/
+!/pla-app/
 !/meteor/
 !.gitignore
 
