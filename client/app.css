@@ -138,12 +138,15 @@ html /deep/ .text_button {
  *                                          'heading')
  */
 body {
-  font-family: Roboto, "Helvetica Neue", sans-serif; }
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  }
   body /deep/ h1,
   body /deep/ h2,
   body /deep/ h3 {
     font-family: "Roboto Slab", serif; }
-
+.content {
+  padding: 24px;
+}
 .polymer-theme {
   /**
    * Retrieves a color value from the $material-colors Sass map

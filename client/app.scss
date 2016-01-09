@@ -13,7 +13,9 @@ body {
     }
   }
 }
-
+.app-theme {
+  @import '../public/components/pla-app/app-theme.html';
+}
 .polymer-theme {
   $color-name-primary:    'teal';
   $color-name-secondary:  'amber';

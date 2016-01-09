@@ -2,7 +2,7 @@
 Meteor.startup(function() {
   $('body')
     .attr('unresolved', '')
-    .attr('class','fullbleed layout vertical polymer-theme');
+    .attr('class','fullbleed layout vertical app-theme');
 
 
 });
