@@ -108,7 +108,12 @@
         return item == 'body';
       },
       dataProp: function(prop) {
-        return this.data[prop];
+        if (typeof this.data[prop] === 'object')
+          return JSON.stringify(this.data[prop]);
+        else {
+          return this.data[prop];  
+        }
+
       },
       getKeys: function (obj) {
         if (obj)

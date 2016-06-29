@@ -17,7 +17,6 @@ accounts-ui
 useraccounts:polymer
 iron:router
 useraccounts:iron-routing
-standard-minifiers
 meteor-base
 mobile-experience
 mongo
@@ -31,3 +30,5 @@ random
 ejson
 spacebars
 check
+standard-minifier-css
+standard-minifier-js

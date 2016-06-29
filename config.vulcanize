@@ -1,5 +1,5 @@
 {
-  "useShadowDom": false,
+  "useShadowDom": true,
   "imports": [
     "/components/polymer/polymer.html",
     "/components/meteor-elements/meteor-connection.html",
@@ -23,6 +23,8 @@
     "/components/paper-tooltip/paper-tooltip.html",
     "/components/paper-styles/paper-styles.html",
     "/components/paper-dropdown-menu/paper-dropdown-menu.html",
+    "/components/google-apis/google-apis.html",
+    "/components/google-chart/google-chart.html",
     "/components/pla-app/app-theme.html",
     "/components/pla-app/pla-event.html",
     "/components/pla-app/pla-group.html",

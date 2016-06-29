@@ -1,5 +1,7 @@
 <!-- <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"> add  to top with other imports  -->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../lib-d3/lib-d3.html">
+<link rel="import" href="pla-chart.html">
 <dom-module id='pla-event-list'  > <!-- CONVERTED WIP -->
 
   <template>
@@ -18,14 +20,32 @@
       .event-detailed {
         height: 700px;
       }
+      #eventschart {
+        height: 400px;
+        width: 960px;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+      }
+      .axis text {
+        font-family: sans-serif;
+        font-size: 11px;
+      }
 
     </style>
 
-    <div class="layout vertical">   <!-- class="layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+    <div class="layout vertical">
 
-      <div class="layout horizontal">   <!-- class="layout horizontal"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+      <div class="layout horizontal">
         <p>Use slider to select events shown</p>
-        <paper-slider class="center" snaps pin secondaryprogress="5" editable value="{{maxEvents}}" min="5" id="paper_slider">
+        <paper-slider class="center"
+          secondaryprogress="5"
+          value="{{maxEvents}}"
+          min="5" id="paper_slider"
+          snaps pin editable>
         </paper-slider>
       </div>
       <div>
@@ -34,13 +54,14 @@
       </div>
       <div class="event-container horizontal layout center" >   <!-- class="horizontal layout center"  // TODO cleanup class= if needed  CONVERTED WIP  -->
         <iron-selector id="selector" selected="{{selectedEvent}}" valueattr="data" class="horizontal layout center flex">   <!-- class="horizontal layout center flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
-        <template is="dom-repeat" items="{{events}}">
-      <!-- TODO fix repeat, replace data, remove extra ="{{key in keys}}"   CONVERTED WIP -->
-          <pla-event class="event flex" data="{{item}}" >   <!-- class="flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+        <!--<template is="dom-repeat" items="{{events}}">
+          <pla-event class="event flex" data="{{item}}" >
           </pla-event>
         </template>
+        -->
         </iron-selector>
       </div>
+      <pla-chart flex events="{{events}}"></pla-chart>
       <div class="horizontal center-justified layout">   <!-- class="horizontal center-justified layout"  // TODO cleanup class= if needed  CONVERTED WIP  -->
         <pla-event class="event-detail flex" data="{{detailedEvent}}" detailed>   <!-- class="flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
         </pla-event>
@@ -65,9 +86,6 @@
           value: 10,
           observer: 'maxEventsChanged'
         },
-        eventsQuery: {
-          type: Object
-        },
         sourceIdsFilter: {
           type: Object,
           observer: 'sourceIdsFilterChanged'
@@ -78,7 +96,9 @@
         },
         events: {
           type: Array,
-          observer: 'eventsChanged'
+          observer: '_eventsChanged',
+          readOnly: false,
+          notify: true
         },
         query: {
           type: Object,
@@ -87,30 +107,31 @@
               "header.Timestamp": -1
             },
             limit: this.maxEvents
-          }
+          },
+          notify: true
         }
       },
-
-      created: function () {
+      ready: function () {
 
       },
-      eventsChanged: function () {
+      _eventsChanged: function (newValue, oldValue) {
         this.$.spinner.active = true;
         this.debounce('evtchanged', function () {
-
           this.$.spinner.active = false;
         });
+        console.log('Events changed', newValue, oldValue)
+
       },
-      maxEventsChanged: function() {
+      maxEventsChanged: function(newValue, oldValue) {
         console.log('In event-list Changing maxEvents to: '+this.maxEvents);
-        console.log('In event-list old query: ',this.query);
+        console.log('In event-list old query: ',oldValue);
         this.query = {
           sort: {
             "header.Timestamp": -1
           },
-          limit: this.maxEvents
+          limit: newValue
         };
-        console.log('new query: ',this.query);
+        console.log('In event-list new query: ',this.query);
       },
       appFilterChanged: function () {
         this.events = [];
@@ -147,6 +168,8 @@
       },
       selectedEventChanged: function (newValue, oldValue) {
         this.detailedEvent = this.events[newValue];
+        this.updateChart();
+
       }
     });
   </script>
@@ -155,9 +178,6 @@
 
 <!-- CONVERSION NOTES TODO:
  Review code and look for:
- - textContent binding from <div>First: {{first}}</div> TO First <span>{{first}}</span><br>
- - polymer-element default attributes such as tabindex="0" move to hostAttributes: {  tabindex: 0}
- - custom elements correct JSON quotes required, change from <my-element foo="{ 'title': 'Persuasion', 'author': 'Austen' }"> to </my-element> to <my-element foo="{ "title": "Persuasion", "author": "Austen" }"></my-element>
  - custom elements attribute use dash-case not camelCase, change from  <my-element fooBar= to <my-element foo-bar
  - Polymer( fix mixins use Behaviors after is: see https://www.polymer-project.org/1.0/docs/devguide/behaviors.html
  - Check layout attributes replaced by layout classes <div layout horizontal center>` to `<div class="layout horizontal center">,

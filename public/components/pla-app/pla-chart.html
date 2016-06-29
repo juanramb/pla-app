@@ -1,14 +1,35 @@
 <!-- <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"> add  to top with other imports  -->
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../lib-d3/lib-d3.html">
+
 <dom-module id='pla-chart'  > <!-- CONVERTED WIP -->
 
   <style>
+    :host {display: block;}
+    #chartwrapper {
+      height: 400px;
+    }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: black;
+      shape-rendering: crispEdges;
+    }
+    .axis text {
+      font-family: sans-serif;
+      font-size: 16px;
+    }
   </style> <!-- TODO Move style tags here from <template> if needed CONVERTED WIP -->
 
   <template>
-    <div class=>   <!-- class=""timeline-wrapper""  // TODO cleanup class= if needed  CONVERTED WIP  --> 
-      <svg id='eventsmap' width='100%' height='60'>    
-        <g  transform = 'translate(0,60)'>   <!-- class="class='map-wrap'"  // TODO cleanup class= if needed  CONVERTED WIP  --> 
+    <div class='chart-wrapper' width='100%' id="chartwrapper">
+      <button on-tap="updateChart">Update</button>
+      <svg id='eventschart' width='100%'>
+      </svg>
+    </div>
+    <div class='timeline-wrapper'>   <!-- class=""timeline-wrapper""  // TODO cleanup class= if needed  CONVERTED WIP  -->
+      <svg id='eventsmap' width='100%' height='60'>
+        <g  transform = 'translate(0,60)'>   <!-- class="class='map-wrap'"  // TODO cleanup class= if needed  CONVERTED WIP  -->
           <rect class='timeline-click-zone' y='-60' height='60'></rect>
           <g id='captionspans' class='caption-spans'></g>
           <line id='currentposition' y1='0' y2='-60'></line>
@@ -18,204 +39,317 @@
   </template>
   <script>
       // the javascript part obviously ...
-    Polymer({
-      is: 'pla-chart', // CONVERTED WIP 
-      duration: null,
-      yScale: null,
-      xScale: null,
-      node: null,
-      d3captions: null,
-      captions: null,
-      dragginCursor: false,
+    Polymer( {
+      is: 'pla-chart', // CONVERTED WIP
+      chartYScale: null,
+      chartXScale: null,
+      chartNode: null,
+      mapYScale: null,
+      mapXScale: null,
+      mapNode: null,
       startTime: null,
       endTime: null,
-      project: null,
-      
+      properties: {
+        //data: null,
+        selectedEvent: {
+          type: Number,
+          observer: 'selectedEventChanged'
+        },
+        svg: {
+          type: Object
+        },
+        chartMargin: {
+          type: Object,
+          value: {top: 5, right: 20, bottom: 5, left: 20}
+        },
+        bar: {
+          type: Object,
+          value: {width: 15, height: 0}
+        },
+        chartWidth: {
+          type: Number,
+          value: 400
+        },
+        chartHeight: {
+          type: Number,
+          value: 500
+        },
+        chartMax: {
+          type: Number,
+          value: 250
+        },
+        vBWidth: {
+          typs: Number,
+          value: 500
+        },
+        vBHeight: {
+          typs: Number,
+          value: 1000
+        },
+        chartPadding: {
+          type: Number,
+          value: 20
+        },
+        events: {
+          type: Array,
+          observer: '_eventsChanged',
+          readOnly: false,
+          notify: true
+        }
+      },
+      translate: function (x, y) {
+        return "translate(" + x + ","
+          + y + ")";
+      },
       ready: function () {
-        this.node = this.$.eventsmap;
-        this.setDuration(this.duration);
-        this.d3Captions = this.$.captionspans;
+
+      },
+      initChart: function () {
+        this.mapNode = this.$.eventsmap;
+        this.chartNode = this.$.eventschart;
+        this.chartWrapper = this.$.chartwrapper;
+        var width = this.$.chartwrapper.clientWidth;
+        var height = this.$.chartwrapper.clientHeight;
+        this.chartWidth =
+          width - this.chartMargin.left - this.chartMargin.right;
+        this.chartHeight =
+          height - this.chartMargin.top - this.chartMargin.bottom;
+
+        console.log('wrapper height', height);
+        console.log('wrapper width', width);
+
+        //this.vBWidth = Math.min(this.chartWidth/2, this.chartHeight/2);
+        //this.vBHeight = Math.max(this.chartWidth/2, this.chartHeight/2);
+        //this.vBWidth = Math.min(this.chartWidth, this.chartHeight);
+        //this.vBHeight = Math.max(this.chartWidth, this.chartHeight);
+        this.vBWidth = this.chartWidth;
+        this.vBHeight = this.chartHeight;
+        console.log('chartWidth %d chartHeight %d vBWidth %d vBHeight %d',
+          this.chartWidth, this.chartHeight, this.vBWidth, this.vBHeight);
+        if (typeof this.svg === 'undefined') {
+          this.svg = d3.select(this.chartNode)
+            .attr('width', '100%')
+            .attr('height', '100%')
+            .attr('viewBox', ''+this.chartMargin.left+' '+this.chartMargin.top+
+              ' '+this.vBWidth+' '+this.vBHeight)
+            .attr('preserveAspectRatio', 'xMinYMin meet')
+            .append('g')
+            .attr('transform',
+              this.translate(this.chartMargin.left, this.chartMargin.top))
+  
+            //  this.chartMargin.left + ', ' + this.chartMargin.top + ')');
+            this.setYScale(this.vBHeight).setXScale(this.vBWidth);
+        } else {
+          d3.select(this.chartNode)
+            .attr('width', '100%')
+            .attr('height', '100%')
+            .attr('viewBox', ''+this.chartMargin.left+' '+this.chartMargin.top+
+              ' '+this.vBWidth+' '+this.vBHeight)
+            .attr('preserveAspectRatio', 'xMinYMin meet');
+            this.setYScale(this.vBHeight).setXScale(this.vBWidth);
+
+        }
         // Keep track of when we are dragging our cursor
         // to ensure better performance in some circumstances.
         this.draggingCursor = false;
+      },
+      attached: function () {
+        this.initChart();
 
-        this.setYScale().setXScale();
         this.bindEvents();
         this.data = this.data || [];
        // We need to ensure that we have a video duration before
        // constructing the timeline.
         if (this.duration) {
-          this.node = this.$.eventsmap;
+          this.mapNode = this.$.eventsmap;
           this.marker = this.$.currentposition;
-          this.wrapper = this.$.find('.timeline-wrapper');
+          this.mapWrapper = this.$.find('.timeline-wrapper');
           this.project = {};
 
           this.setXScale()
-              .drawClickZone();
+              //.drawClickZone();
 
           // DRAW TIMELINE
           // Uses Enter() and Exit()
           this.appendData(this.data)
-              .drawTimeline();
+              //.drawTimeline();
         }
-      },
-      detached: function () {
-        if (this.playbackPosition) this.playbackPosition.stop();
-        if (this.videoDuration) this.videoDuration.stop();
-        if (this.drawTimeline) this.drawTimeline.stop();
-        if (this.updateChangedCaptions) this.updateChangedCaptions.stop();
-      },
-      // DURATION CHANGE
-      videoDurationChanged: function () {
-        this.setDuration(this.videoDuration)
-            .setXScale()
-            .redraw();
-      },
-      // PLAYBACK POSITION CHANGE
-      playbackPositionChanged: function () {
-        if (!this.draggingCursor)
-          this.updateMarkerPosition(this.currentTime);
-      },
-      // UPDATE CHANGED CAPTIONS
-      // HERES THE ISSUE. WE NEED TO UPDATE OUR DATA
-      //
-      // d3 doesn't have a Changed() so we, in effect, implement
-      // it here.
+        this.updateChart();
 
-      dataChanged: function (oldValue, newValue) {
-        //changed: function(id){
-        this.appendData(this.data);
+      },
+      // determine our X scale. This is dependent
+      // upon our wrapper width and the duration of the video.
+      setXScale : function(w){
+        this.chartXScale = d3.time.scale()
+          .range([0, w]);
+        this.mapXScale = d3.scale.linear()
+          .domain([0, this.duration])
+          .range([0, $(this.mapWrapper).width()]);
+        return this;
       },
       // determine our Y scale. Constant...
-      setYScale : function(){
-        this.yScale = d3.scale.linear()
+      setYScale: function (h) {
+        this.chartYScale = d3.scale.linear()
+          .domain([0,this.chartMax*2])
+          .range([h,0]);
+        this.mapYScale = d3.scale.linear()
           .domain([0, 4])
           .range([10, 60]);
         return this;
       },
-      
-      // determine our X scale. This is dependent
-      // upon our wrapper width and the duration of the video.
-      setXScale : function(){
-        this.xScale = d3.scale.linear()
-          .domain([0, this.duration])
-          .range([0, $(this.wrapper).width()]);
-        return this;
+      reloadXAxis: function () {
+        console.log('reloadXAxis');
+        console.log('scales:',this.chartYScale, this.chartXScale)
+        //console.log('x scales domain and range:',this.chartXScale.domain(), this.chartXScale.range())
+
+        if (typeof this.chartXAxis === 'undefined') {
+          console.log('chartXAxis is not defined, creating...');
+          this.chartXAxis = d3.svg.axis()
+            .scale(this.chartXScale)
+            .orient('bottom')
+            .ticks(Math.max(this.vBWidth/50,2))
+            .tickFormat(d3.time.format('%Y-%m-%dT%X'));
+          console.log('created chartXAxis: ', this.chartXAxis);
+          console.log('this.svg in pla-chart:',this.svg);
+          this.svg
+            .append('g')
+            .attr('class', 'axis xaxis')
+            .attr('transform',
+              'translate(0, ' + (this.bar.height + this.chartYScale(this.vBHeight - this.chartMargin.top - 5)) + ')')
+            .call(this.chartXAxis)
+            .selectAll('text')
+            .attr('dy', '.50em')
+            .attr('y', 0)
+            .attr('x', 60)
+            .attr('transform', 'rotate(45)');
+        } else {
+          this.chartXAxis.scale(this.chartXScale)
+            .ticks(Math.max(this.vBWidth/50,2));
+          this.svg
+            .transition()
+            .select('.xaxis')
+            .duration(100)
+            .call(this.chartXAxis)
+            .selectAll('text')
+            .attr('dy', '.50em')
+            .attr('y', 0)
+            .attr('x', 60)
+            .attr('transform', 'rotate(45)');
+        }
       },
-      
-      setDuration: function(time){
-        this.duration = time;
-        return this;
-      },
-      
-      // Determine the WPM of a supplied caption
-      getWPMRatio : function(cap){
-        var dataLength = typeof cap.text === 'undefined' ? 11 : cap.text.split(' ').length
-          , duration = cap.endTime - cap.startTime;
-      
-        return dataLength / duration;
-      },
-      
-      // Our primary subtitle drawing logic. Pass in a caption.
-      drawSubtitles : function(caption){
-        var self = this;
-        caption
-          .attr('data-id', function (cap) { return cap._id; })
-          .attr('class', 'timelineEvent')
-          .attr('opacity', function (cap) {
-            // Low opacity if not saved.
-            return cap.saved ? 1 : 0.3;
-          })
-          .attr('fill', function (cap) {
-            // If not saved, make it white.
-            if (!cap.saved)
-              return 'white';
-      
-            // Provide colour warnings if too fast rate / second
-            var rate = self.getWPMRatio(cap);
-            if (rate <= 2.3) return '#50ddfb';
-            else if (rate > 2.3 && rate < 3.1) return '#fbb450';
-            else return '#ea8787';
-          })
-          .attr('x', function (cap) { return self.xScale(cap.startTime); })
-          .attr('y', function (cap) { return '-' + self.yScale(self.getWPMRatio(cap)); })
-          .attr('width', function (cap) {
-            return self.xScale(cap.endTime) - self.xScale(cap.startTime);
-          })
-          .attr('height', function (cap) {
-            return self.yScale(self.getWPMRatio(cap));
-          });
-      
-        return this;
-      },
-      
-      // Ensures that we have an invisible click-zone, allowing seeking
-      // on the timeline.
-      drawClickZone : function(){
-        d3.select(this.node)
-          .select('rect.timeline-click-zone')
-          .attr('width', $(this.wrapper).width());
-        return this;
-      },
-      
-      // Our basic drawing logic.
-      drawTimeline : function(){
-        var self = this;
-        this.drawSubtitles(this.captions.enter().append('rect'));
-        this.captions
-          .exit()
-          .transition()
-          .duration(300)
-          .style('opacity', 0)
-          .remove();
-        return this;
-      },
-      
-      updateMarkerPosition : function(currentTime){
-        var xAxis = this.xScale ? this.xScale(currentTime) : 0;
-        d3.select(this.marker)
-          .transition()
-          .duration(200)
-          .attr('x1', xAxis)
-          .attr('x2', xAxis);
-        return this;
-      },
-      
-      // Appends our subtitles reactive data source to our
-      // d3 captions.
-      appendData : function(subtitles, update){
-        this.captions = d3.select(this.node)
-          .select('#caption-spans')
+      updateChart: function () {
+        console.log('updatecharttt')
+        this.initChart();
+        console.log('first event: ', this.events[0]);
+        if (this.events && this.events.length === 0)
+          return;
+        this.bar.height = this.chartYScale(this.vBHeight-this.chartPadding);
+        var dateFn = function (d) {
+          var format = d3.time.format('%Y-%m-%dT%X');
+          var ts = d.header.Timestamp;
+          var date = format.parse(ts.slice(0,ts.length-6));
+          return date;
+        };
+        var yVarFn = function (d) {
+          return this.vBHeight - this.chartMargin.top;
+        };
+        var heightFn = function (d) {
+          return this.vBHeight-this.chartPadding;
+          //return this.chartHeight-this.chartPadding-this.chartYScale(yVarFn());
+        };
+        var colourFn = function (d) {
+          var color;
+          switch (d.header.application) {
+              case 'gcc':
+                color = '#34b0f1';
+                break;
+              case 'kate':
+                color = 'orange';
+                break;
+              case 'svn':
+                color = '#f17782';
+                break;
+              case 'valgrind':
+                color = '#63dd6e';
+                break;
+              default:
+                color = 'grey';
+          }
+          return color;
+        };
+
+
+        if (!this.chartXScale) {
+          console.log('chartXScale es undefined, setting...');
+          this.setXScale(this.vBWidth);
+          console.log('chartXScale set to', this.chartXScale);
+        }
+        //change X scale based on new data
+        this.chartXScale.domain(d3.extent(this.events, dateFn.bind(this)));
+        console.log('dates extent', d3.extent(this.events, dateFn.bind(this)));
+        console.log('chartXscale domain:', this.chartXScale.domain());
+
+
+        //update chart with new data
+        var rects = this.svg
           .selectAll('rect')
-          .data(subtitles, function(sub){
-            return sub._id;
-          });
-        return this;
+          .data(this.events);
+        rects.transition()
+          .attr('x', function (d, i) {
+            console.log('xdata in transition:',this.chartXScale(dateFn(d)));
+            return this.chartXScale(dateFn(d));
+          }.bind(this))
+          .attr('y', function (d) {
+            return this.chartYScale(yVarFn.bind(this)(d));
+          }.bind(this))
+          .attr('height', this.bar.height)
+          .attr('color', colourFn.bind(this))
+          .attr('width' , 15);
+
+        rects
+          .enter()
+          .append('rect')
+          .attr('class','bar')
+          .attr('x', function (d, i) {
+              console.log('xdata in enter:',this.chartXScale(dateFn(d)));
+              console.log('dateFn',dateFn(d))
+              return this.chartXScale(dateFn(d));
+          }.bind(this))
+          .attr('y', function (d) {
+            return this.chartYScale(yVarFn.bind(this)(d));
+          }.bind(this))
+          .attr('height', this.bar.height)
+          .attr('color', colourFn.bind(this))
+          .attr('width' , 15);
+
+        // then change axis accordingly
+        if (typeof this.chartXAxis === 'undefined') {
+          console.log('chartXAxis es undefined');
+          this.reloadXAxis();
+          //this.chartXAxis.scale(this.chartXScale);
+        } else {
+          this.reloadXAxis();
+        }
+
+
+
       },
-      
-      changeCaption : function(caption){
-        var filtered = this.captions.filter(function(node, i){
-          return node._id === caption;
-        });
-        this.drawSubtitles(filtered.transition().duration(300));
+      _eventsChanged: function (newValue, oldValue) {
+        console.log('Events changed', newValue, oldValue)
+        this.updateChart.bind(this)()
       },
-      
-      redraw: function(){
-        if (this.captions)
-          this.drawSubtitles(this.captions.transition().duration(300));
+      selectedEventChanged: function (newValue, oldValue) {
+        this.detailedEvent = this.events[newValue];
+        this.updateChart();
+
       },
-      
-      // Events:
-      
-      // Our basic events start here. If we are dragging our cursor
-      // on the timeline, we run this.
       setMarkerPosition: function(options) {
         var self = this,
-            xPosition = d3.mouse(self.wrapper)[0],
+            xPosition = d3.mouse(self.mapWrapper)[0],
             opts = options || false;
-      
-        if (xPosition >= 0 && xPosition <= $(self.wrapper).width()) {
-      
+
+        if (xPosition >= 0 && xPosition <= $(self.mapWrapper).width()) {
+
           // Don't animate while dragging
           if (opts.animate)
             d3.select(self.marker)
@@ -238,8 +372,8 @@
         if (this.draggingCursor) {
           this.draggingCursor = false;
           var x = d3.select(this.marker).attr('x1');
-          if (x >= 0 && x <= $(this.node).width()) {
-            this.currentTime = this.xScale.invert(x);
+          if (x >= 0 && x <= $(this.mapNode).width()) {
+            this.currentTime = this.mapXScale.invert(x);
           }
         }
       },
@@ -257,31 +391,12 @@
           self.setMarkerPosition();
         });
         d3.select(window).on('mouseup', _.bind(this.onMouseUp, this));
-        d3.select(self.node).select('.timeline-click-zone').on('click', function(){
+        d3.select(self.mapNode).select('.timeline-click-zone').on('click', function(){
           self.setMarkerPosition({ animate: true, sync: true });
         });
-        d3.select(window).on('resize', _.debounce(_.bind(this.onWindowResize, this), 300));
+        d3.select(window).on('resize', _.debounce(_.bind(this.updateChart, this), 300));
       }
     });
   </script>
-</dom-module> <!-- CONVERTED -->
 
-
-<!-- CONVERSION NOTES TODO:
- Review code and look for: 
- - textContent binding from <div>First: {{first}}</div> TO First <span>{{first}}</span><br>
- - polymer-element default attributes such as tabindex="0" move to hostAttributes: {  tabindex: 0}
- - custom elements correct JSON quotes required, change from <my-element foo="{ 'title': 'Persuasion', 'author': 'Austen' }"> to </my-element> to <my-element foo="{ "title": "Persuasion", "author": "Austen" }"></my-element>
- - custom elements attribute use dash-case not camelCase, change from  <my-element fooBar= to <my-element foo-bar
- - Polymer( fix mixins use Behaviors after is: see https://www.polymer-project.org/1.0/docs/devguide/behaviors.html
- - Check layout attributes replaced by layout classes <div layout horizontal center>` to `<div class="layout horizontal center">, 
- - Cleanup class= 
- - Convert core- to iron- or paper- replacement elements at PolymerElements
- - Remove unresolved from <body> tag
- - Cleanup iron-ajax params url for embedded bindings {{}}
- - iron-ajax replace this.$.xxx_ajax.abort(); and this.$.xxx_ajax.go(); with this.$.xxx_ajax.generateRequest() 
- - Fix iron-list if needed 
- - Fix indentation as need 
- - Cleanup Comments to reflect changes ,
- - see https://www.polymer-project.org/1.0/docs/migration.html
-   -->
+</dom-module>

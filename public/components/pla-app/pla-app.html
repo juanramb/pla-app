@@ -1,6 +1,6 @@
-<!-- <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html"> add  to top with other imports  -->
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../pla-app/app-theme.html">
+<!--<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">-->
 <dom-module id='pla-app'> <!-- CONVERTED WIP -->
 
 <style include="shared-styles">
@@ -15,125 +15,151 @@
     .filtering-column {
       margin: 10px;
     }
+google-chart {
+      height: 300px;
+      width: 400px;
+    }
+
 </style> <!-- TODO Move style tags here from <template> if needed CONVERTED WIP -->
 
 <template>
   <meteor-connection connected="{{metConnected}}"></meteor-connection>
+  <meteor-subscribe name="allevents"
+    isready="{{eventsSubReady}}"
+    args="[]"
+    on-subscribe-ready="eventsSubReadyChanged"
+    on-subscribe-error="eventsSubscribeError">
+  </meteor-subscribe>
+  <meteor-subscribe name="allalumns" isready="{{alumnsSubReady}}" args="[]">
+  </meteor-subscribe>
+  <meteor-subscribe name="allgroups" isready="{{groupsSubReady}}" args="[]">
+  </meteor-subscribe>
+  <meteor-subscribe name="allapps" isready="{{appsSubReady}}" args="[]">
+  </meteor-subscribe>
 
   <meteor-collection name="plaevents" _ref={{eventsCollection}}>
-    <meteor-query id="query" options="{{eventsQueryOptions}}" enable="{{eventsSubReady}}" query="{{eventsQuery}}" data="{{allEvents}}">
+    <meteor-query id="query"
+      options="{{eventsQueryOptions}}"
+      enable="{{eventsSubReady}}"
+      query="{{eventsQuery}}"
+      data="{{allEvents}}">
     </meteor-query>
   </meteor-collection>
 
   <meteor-collection name="alumns">
-    <meteor-query id="alumnsQuery" enable="{{alumnsSubReady}}" query="{{alumnsQuery}}" options="{{alumnsQueryOptions}}" data="{{alumns}}">
+    <meteor-query id="alumnsQuery"
+      enable="{{alumnsSubReady}}"
+      query="{{alumnsQuery}}"
+      options="{{alumnsQueryOptions}}"
+      data="{{alumns}}">
     </meteor-query>
   </meteor-collection>
   <meteor-collection name="groups">
-    <meteor-query id="groupsQuery" enable="{{groupsSubReady}}" options="{{groupsQueryOptions}}" data="{{groups}}">
+    <meteor-query id="groupsQuery"
+      enable="{{groupsSubReady}}"
+      options="{{groupsQueryOptions}}"
+      data="{{groups}}">
     </meteor-query>
   </meteor-collection>
   <meteor-collection name="apps" _ref="{{appsCollection}}">
-    <meteor-query id="appsQuery" enable="{{appsSubReady}}" query="{{appsQuery}}" options="{{appsQueryOptions}}" data="{{apps}}">
+    <meteor-query id="appsQuery"
+      enable="{{appsSubReady}}"
+      query="{{appsQuery}}"
+      options="{{appsQueryOptions}}"
+      data="{{apps}}">
     </meteor-query>
   </meteor-collection>
 
-  <meteor-subscribe name="allevents" isready="{{eventsSubReady}}">
-  </meteor-subscribe>
-  <meteor-subscribe name="allalumns" isready="{{alumnsSubReady}}">
-  </meteor-subscribe>
-  <meteor-subscribe name="allgroups" isready="{{groupsSubReady}}">
-  </meteor-subscribe>
-  <meteor-subscribe name="allapps" isready="{{appsSubReady}}">
-  </meteor-subscribe>
-  <div id="app" class="layout horizontal">
-    <div id="events" class="layout vertical flex">   <!-- class="layout vertical flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+
+  <div id="app" class="layout horizontal flex">
+    <div class="filtering layout vertical" >
+      <div class="filtering-row layout horizontal" >   <!-- class="layout horizontal"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+        <paper-dropdown-menu label="Filter by app">
+          <paper-menu class="dropdown-content" label="Filter by app">
+            <iron-selector valueattr="label" selected="{{selectedApp}}">
+              <paper-item label="all">All <span>{{apps.length}}</span> </paper-item>
+              <template is="dom-repeat" items="{{apps}}">
+                <paper-item label="{{item.name}}" class="{{item.name}}">{{item.name}}</paper-item>
+              </template>
+            </iron-selector>
+          </paper-menu>
+        </paper-dropdown-menu>
+      </div>
+      <div class="filtering-row layout horizontal flex">
+        <div id="groups" class="filtering-column layout vertical">
+          <div class="vertical layout flex">
+              <div id="groupsheader" on-click="clearSelectedGroup" class="layout horizontal">
+                <span>Groups</span>
+                <paper-badge for="groupsheader" label="{{groups.length}}"></paper-badge>
+              </div>
+              <iron-selector id="group-selector" selected-values="{{selectedGroup}}" attr-for-selected="group" class="vertical layout flex" multi>   <!-- class="vertical layout flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+                <template is="dom-repeat" items="{{groups}}">
+                  <pla-group group="{{item}}">
+                  </pla-group>
+                </template>
+              </iron-selector>
+          </div>
+        </div>
+        <div id="alumns" class="filtering-column layout vertical" >   <!-- class="layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+          <div>
+              <div data="" id="alumnsheader" on-click="clearSelectedAlumn" class="layout horizontal">
+                 <span>Alumns</span>
+                 <paper-badge for="alumnsheader" label="{{alumns.length}}"></paper-badge>
+              </div>
+            <iron-selector id="alumn-selector" selected-values="{{selectedAlumns}}" attr-for-selected="alumn" class="vertical layout flex" multi>   <!-- class="vertical layout flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+              <template is="dom-repeat" items="{{alumns}}">
+                <pla-alumn alumn="{{item}}" class="button_secondary"></pla-alumn>
+              </template>
+            </iron-selector>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="events" class="layout vertical flex">
 
       <div>
         <h2>
           Events for <span>{{eventsCollection._name}}</span>
         </h2>
         Sub ready: <span>{{eventsSubReady}}</span>
-        <pla-event-list id="eventlist" appFilter="{{appFilter}}" sourceIdsFilter="{{sourceIdsFilter}}" query="{{eventsQuery}}" events="{{allEvents}}">
+        <pla-event-list id="eventlist"
+          appFilter="{{appFilter}}"
+          sourceIdsFilter="{{sourceIdsFilter}}"
+          query="{{eventsQueryOptions}}"
+          events="{{allEvents}}">
         </pla-event-list>
       </div>
-      <div class="horizontal center-justified layout">   <!-- class="horizontal center-justified layout"  // TODO cleanup class= if needed  CONVERTED WIP  -->
-        <!--<google-chart
-          cols='[{"label": "Data", "type": "string"},{"label": "Value", "type": "number"}]'
-          rows='[["Something", 1]]'>
-        </google-chart>
-        -->
-        <!--       
-          <google-chart
-            id='events-chart'
-            type='column'
-            cols='[{"label": "Time", "type": "datetime", {"label": "Event", "type": "number"}]'
-            rows='[["Date(2016,1,1,0,1)",1], ["Date(2016,1,1,0,2)",1]]'>
-          </google-chart>
-        -->
-            
-            
+      <div class="horizontal center-justified layout">
 
-        <div class="relative" style="height: 300px; " id="svgdiv">   <!-- class="relative"  // TODO cleanup class= if needed  CONVERTED WIP  -->
+        <div class="relative" style="height: 300px; " id="svgdiv">
           <!--<pla-event data="{{selectedEvent}}">
           </pla-event>-->
         </div>
       </div>
     </div>
-      <div class="filtering layout vertical" >
-        <div class="filtering-row layout horizontal" >   <!-- class="layout horizontal"  // TODO cleanup class= if needed  CONVERTED WIP  -->
-          <paper-dropdown-menu label="Filter by app">
-            <paper-menu class="dropdown-content" label="Filter by app">
-              <iron-selector valueattr="label" selected="{{selectedApp}}">
-                <paper-item label="all">All <span>{{apps.length}}</span> </paper-item>
-                <template is="dom-repeat" items="{{apps}}">
-                  <paper-item label="{{item.name}}" class="{{item.name}}">{{item.name}}</paper-item>
-                </template>
-              </iron-selector>
-            </paper-menu>
-          </paper-dropdown-menu>
-        </div>
-        <div class="filtering-row layout horizontal flex" >   <!-- class="layout horizontal flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
-          <div id="groups" class="filtering-column layout vertical" >   <!-- class="layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
-            <div class="vertical layout flex">
-                <div id="groupsheader" on-click="clearSelectedGroup" class="layout horizontal">
-                  <span>Groups</span>
-                  <paper-badge for="groupsheader" label="{{groups.length}}"></paper-badge>
-                </div>
-                <iron-selector id="group-selector" selected-values="{{selectedGroup}}" attr-for-selected="group" class="vertical layout flex" multi>   <!-- class="vertical layout flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
-                  <template is="dom-repeat" items="{{groups}}">
-                    <pla-group group="{{item}}">
-                    </pla-group>
-                  </template>
-                </iron-selector>
-            </div>
-          </div>
-          <div id="alumns" class="filtering-column layout vertical" >   <!-- class="layout vertical"  // TODO cleanup class= if needed  CONVERTED WIP  -->
-            <div>
-                <div data="" id="alumnsheader" on-click="clearSelectedAlumn" class="layout horizontal">
-                   <span>Alumns</span>
-                   <paper-badge for="alumnsheader" label="{{alumns.length}}"></paper-badge>
-                </div>
-              <iron-selector id="alumn-selector" selected-values="{{selectedAlumns}}" attr-for-selected="alumn" class="vertical layout flex" multi>   <!-- class="vertical layout flex"  // TODO cleanup class= if needed  CONVERTED WIP  -->
-                <template is="dom-repeat" items="{{alumns}}">
-                  <pla-alumn alumn="{{item}}" class="button_secondary"></pla-alumn>
-                </template>
-              </iron-selector>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </template>
+
+  </div>
+</template>
 
   <script>
     Polymer( {
       is: 'pla-app', // CONVERTED WIP
       properties: {
+        groups: Array,
+        groupsCollection: Object,
+        groupsQueryOptions: {
+          type: Object,
+          value: {sort: { name: 1}}
+        },
+        selectedGroup: {
+          type: Object,
+          observer: 'selectedGroupChanged'
+        },
+        selectedGroupAttr: String,
         eventsCollection: Object,
-        subReady: {
+        eventsSubReady: {
           type: Boolean,
-          observer: 'subReadyChanged'
+          observer: 'eventsSubReadyChanged'
         },
         alumnsSubReady: Boolean,
         groupsSubReady: Boolean,
@@ -141,7 +167,14 @@
         appFilter: String,
         sourceIdsFilter: String,
         maxEvents: Number,
-        allEvents: Array,
+        allEvents: {
+          type: Array,
+          observer: 'allEventsChanged'
+        },
+        indexedEvents: {
+          type: Array,
+          observer: 'indexedEventsChanged'
+        },
         selectedEvent: Object,
         selectedId: {
           type: String,
@@ -171,17 +204,7 @@
           notify: true,
           readOnly: false
         },
-        groups: Array,
-        groupsCollection: Object,
-        groupsQueryOptions: {
-          type: Object,
-          value: {sort: { name: 1}}
-        },
-        selectedGroup: {
-          type: Object,
-          observer: 'selectedGroupChanged'
-        },
-        selectedGroupAttr: String,
+
         alumns: {
           type: Array,
           observer: 'alumnsChanged'
@@ -221,6 +244,10 @@
         //query: {
         //   "header.application": "gcc"
         //},
+        eventsQuery: {
+          type: Object,
+          observer: 'eventsQueryChanged'
+        },
         eventsQueryOptions: {
           type: Object,
           value: {
@@ -231,13 +258,16 @@
           },
           observer: 'eventsQueryOptionsChanged'
         }
-      },
+      },//end properties
       created: function () {
         console.log('pla-app created');
 
       },
       eventsQueryOptionsChanged: function (newValue, oldValue) {
         console.log('on pla-app, eventsQueryOptions changed to: ',newValue);
+      },
+      eventsQueryChanged: function (newValue, oldValue) {
+        console.log('on pla-app, eventsQuery changed to: ',newValue);
       },
       selectedIdChanged: function () {
         this.selectedEvent = this.collection.findOne(this.selectedId);
@@ -305,6 +335,15 @@
         console.log('selected alumns sourcesId:', sourceIds);
         this.selectedSourceIds = sourceIds;
       },
+      allEventsChanged: function (newEvents, oldEvents) {
+        this.indexedEvents = newEvents.map(function (event) {
+          return event;
+        });
+
+      },
+      indexedEventsChanged: function (newEvents, oldEvents) {
+        console.log('Indexed events changed to ',newEvents);
+      },
       selectedSourceIdsChanged: function () {
         if (this.selectedSourceIds && this.selectedSourceIds.length > 0) {
           this.sourceIdsFilter = {'sourceId': {$in: this.selectedSourceIds}};
@@ -313,14 +352,17 @@
           this.sourceIdsFilter = {};
         }
       },
-      subReadyChanged: function() {
+      eventsSubReadyChanged: function(newValue, oldValue) {
         // wait subscribtion ready state before querying
-        console.log('Subready changed');
-        if (this.subReady && this.collection) {
+        console.log('Subready changed from %s to %s',oldValue, newValue);
+        if (this.eventsSubReady && this.collection) {
           console.log('Collection: ',this.collection);
           //this.plaevents=this.collection.find();
           //console.log('Plaevents: ',this.plaevents);
         }
+      },
+      eventsSubscribeError: function (details) {
+        console.log('Events subscribe error: ',details);
       },
       alumnsSubReadyChanged: function () {
 
@@ -338,6 +380,9 @@
       },
       _getStatusIcon: function (connected) {
         return connected? 'cloud-done': 'cloud-off';
+      },
+      ready: function () {
+
       }
 
     });
